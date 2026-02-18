@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Comprobante de Pago JASA para CUADRA</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        // JASA Brand Colors based on user request
+                        "primary": "#e44f9c", // Strong pink
+                        "primary-dark": "#c23b82",
+                        "primary-light": "#ff97d9",
+                        "accent": "#42fae0", // Turquoise
+                        "accent-dark": "#2ec8b0",
+                        "accent-light": "#7af9e6",
+                        "background-light": "#f8fdfb", // Very slight turquoise tint for clean white feel
+                        "background-dark": "#181015", // Dark mode background slightly tinted
+                        "surface-light": "#ffffff",
+                        "surface-dark": "#231820",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.5rem", "lg": "0.75rem", "xl": "1rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-gray-900 dark:text-gray-100 antialiased min-h-screen flex flex-col items-center">
+<div class="w-full max-w-md bg-background-light dark:bg-background-dark min-h-screen flex flex-col relative shadow-2xl overflow-hidden">
+<header class="flex items-center justify-between px-6 py-5 z-20 sticky top-0 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-sm">
+<button class="flex items-center justify-center p-2 -ml-2 rounded-full hover:bg-gray-100 dark:hover:bg-white/10 transition-colors text-gray-800 dark:text-gray-200">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<div class="flex-1 text-center flex flex-col items-center justify-center">
+<h1 class="text-xl font-extrabold tracking-tight text-gray-900 dark:text-white leading-none">CUADRA</h1>
+<span class="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mt-0.5">by JASA</span>
+</div>
+<div class="size-9 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-lg">settings</span>
+</div>
+</header>
+<main class="flex-1 overflow-y-auto px-5 pb-32 no-scrollbar flex flex-col items-center w-full">
+<div class="w-full mt-2 mb-6 drop-shadow-xl filter">
+<div class="bg-surface-light dark:bg-surface-dark w-full rounded-t-2xl rounded-b-xl overflow-hidden relative p-0 flex flex-col shadow-sm">
+<div class="h-2 w-full flex">
+<div class="w-2/3 bg-primary h-full"></div>
+<div class="w-1/3 bg-accent h-full"></div>
+</div>
+<div class="p-6 pb-8 flex flex-col gap-6 relative">
+<div class="absolute top-5 right-5">
+<div class="size-12 rounded-full bg-accent/10 dark:bg-accent/20 flex items-center justify-center text-accent-dark dark:text-accent border border-accent/20">
+<span class="material-symbols-outlined text-2xl">check</span>
+</div>
+</div>
+<div class="flex flex-col gap-1 pr-12">
+<div class="flex items-center gap-2 mb-1">
+<span class="h-1.5 w-1.5 rounded-full bg-primary"></span>
+<p class="text-[11px] font-bold text-primary uppercase tracking-widest">Comprobante de Abono</p>
+</div>
+<h2 class="text-2xl font-bold text-gray-900 dark:text-white leading-tight">Panadería Los Andes</h2>
+<div class="flex items-center gap-2 mt-2 flex-wrap">
+<span class="text-xs text-gray-500 dark:text-gray-400 font-medium bg-gray-50 dark:bg-white/5 px-2 py-1 rounded border border-gray-100 dark:border-white/10">#2405</span>
+<span class="text-xs text-gray-300 dark:text-gray-600">•</span>
+<span class="text-xs text-gray-500 dark:text-gray-400 font-medium">10 Oct 2023, 10:42 AM</span>
+</div>
+</div>
+<div class="relative h-px w-full my-1">
+<div class="absolute inset-0 flex items-center">
+<div class="w-full border-t-2 border-dashed border-gray-100 dark:border-white/10"></div>
+</div>
+</div>
+<div class="flex flex-col gap-5">
+<div class="flex flex-col items-center justify-center py-2 relative">
+<div class="absolute inset-0 bg-primary/5 dark:bg-primary/10 blur-2xl rounded-full scale-75 opacity-50"></div>
+<span class="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wide z-10">Monto Abonado</span>
+<div class="flex items-baseline gap-1 mt-1 z-10">
+<span class="text-5xl font-extrabold text-primary tracking-tighter drop-shadow-sm">$50.00</span>
+<span class="text-lg font-bold text-gray-400 dark:text-gray-600">USD</span>
+</div>
+</div>
+<div class="bg-gradient-to-br from-background-light to-white dark:from-white/5 dark:to-white/0 rounded-xl p-4 flex items-center justify-between border border-accent/20 dark:border-accent/10 relative overflow-hidden">
+<div class="absolute -top-6 -right-6 w-12 h-12 bg-accent/20 rounded-full blur-xl"></div>
+<div class="flex flex-col relative z-10">
+<span class="text-[11px] text-gray-500 dark:text-gray-400 font-medium mb-1">Equivalente en Bolívares</span>
+<span class="text-xl font-bold text-gray-800 dark:text-gray-100 tracking-tight">Bs. 1,750.00</span>
+</div>
+<div class="flex flex-col items-end relative z-10">
+<span class="text-[9px] font-bold text-accent-dark dark:text-accent uppercase tracking-wider mb-1">Tasa BCV</span>
+<div class="flex items-center gap-1.5 bg-white dark:bg-surface-dark px-2.5 py-1.5 rounded-lg border border-gray-100 dark:border-white/10 shadow-sm">
+<span class="material-symbols-outlined text-sm text-accent-dark dark:text-accent">currency_exchange</span>
+<span class="text-sm font-bold text-gray-700 dark:text-gray-200">35.00</span>
+</div>
+</div>
+</div>
+</div>
+<div class="flex items-center justify-between bg-red-50 dark:bg-red-900/10 p-4 rounded-xl border border-red-100 dark:border-red-500/10 mt-1">
+<div class="flex items-center gap-3">
+<div class="bg-white dark:bg-red-900/40 p-1.5 rounded-full text-red-500 dark:text-red-400 shadow-sm border border-red-50 dark:border-transparent">
+<span class="material-symbols-outlined text-base block">pending_actions</span>
+</div>
+<div class="flex flex-col">
+<span class="text-xs font-bold text-red-800 dark:text-red-300 uppercase tracking-wide">Saldo Pendiente</span>
+<span class="text-[10px] text-red-600/70 dark:text-red-400/70 font-medium">Por cobrar</span>
+</div>
+</div>
+<span class="text-lg font-bold text-red-600 dark:text-red-400">$120.00</span>
+</div>
+<div class="text-center pt-2 flex flex-col items-center gap-1">
+<p class="text-sm text-gray-400 italic font-medium">Gracias por su pago</p>
+<div class="h-1 w-12 bg-gray-100 dark:bg-white/10 rounded-full mt-2"></div>
+</div>
+</div>
+</div>
+<div class="h-4 w-full relative -mt-0.5 z-10">
+<div class="w-full h-full bg-surface-light dark:bg-surface-dark" style="clip-path: polygon(0 0, 2.5% 100%, 5% 0, 7.5% 100%, 10% 0, 12.5% 100%, 15% 0, 17.5% 100%, 20% 0, 22.5% 100%, 25% 0, 27.5% 100%, 30% 0, 32.5% 100%, 35% 0, 37.5% 100%, 40% 0, 42.5% 100%, 45% 0, 47.5% 100%, 50% 0, 52.5% 100%, 55% 0, 57.5% 100%, 60% 0, 62.5% 100%, 65% 0, 67.5% 100%, 70% 0, 72.5% 100%, 75% 0, 77.5% 100%, 80% 0, 82.5% 100%, 85% 0, 87.5% 100%, 90% 0, 92.5% 100%, 95% 0, 97.5% 100%, 100% 0);"></div>
+</div>
+<div class="h-6 w-full bg-gradient-to-b from-black/5 to-transparent dark:from-black/40 -mt-4 z-0 relative"></div>
+</div>
+<div class="w-full mt-4">
+<div class="flex items-center justify-between mb-3 px-2">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-accent-dark dark:text-accent text-lg">visibility</span>
+<h3 class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">Vista previa del mensaje</h3>
+</div>
+</div>
+<div class="bg-white dark:bg-surface-dark rounded-2xl p-4 shadow-sm border border-gray-100 dark:border-white/5 relative group cursor-pointer hover:border-accent/40 hover:shadow-md transition-all duration-300">
+<div class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-50 dark:bg-white/10 p-1.5 rounded-full">
+<span class="material-symbols-outlined text-primary text-xs">edit</span>
+</div>
+<div class="flex gap-4 items-start">
+<div class="size-11 rounded-full bg-gradient-to-br from-[#25D366] to-[#128C7E] flex items-center justify-center shrink-0 shadow-sm text-white">
+<span class="material-symbols-outlined text-xl">chat</span>
+</div>
+<div class="space-y-1.5 flex-1">
+<div class="flex justify-between items-center">
+<p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">WhatsApp</p>
+<span class="text-[10px] text-gray-300">Ahora</span>
+</div>
+<div class="bg-gray-50 dark:bg-black/20 p-3 rounded-lg rounded-tl-none border border-gray-100 dark:border-white/5">
+<p class="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
+                                    Hola <span class="font-bold text-gray-900 dark:text-white">Panadería Los Andes</span>, adjunto el recibo de tu abono por <span class="font-bold text-primary">$50.00</span>. Tu saldo restante es de $120.00. <br/>
+<span class="text-xs text-gray-400 mt-1 block font-medium">Enviado vía CUADRA</span>
+</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-8 mb-4 flex flex-col items-center opacity-60">
+<div class="flex items-center gap-1.5">
+<span class="text-xs text-gray-400">Tecnología</span>
+<span class="text-xs font-bold text-primary">CUADRA</span>
+</div>
+<span class="text-[10px] text-gray-300 uppercase tracking-wider scale-90">Powered by JASA</span>
+</div>
+</main>
+<div class="fixed bottom-0 left-0 w-full p-5 pt-0 z-30 flex justify-center max-w-md mx-auto relative pointer-events-none">
+<div class="w-full pointer-events-auto pb-6 pt-6 bg-gradient-to-t from-background-light via-background-light/90 to-transparent dark:from-background-dark dark:via-background-dark/90">
+<button class="w-full bg-primary hover:bg-primary-dark active:scale-[0.98] transition-all duration-200 text-white font-bold text-lg h-14 rounded-2xl shadow-[0_8px_25px_-6px_rgba(228,79,156,0.5)] flex items-center justify-center gap-3 group border border-white/10 overflow-hidden relative">
+<div class="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]"></div>
+<span class="material-symbols-outlined text-2xl group-hover:rotate-12 transition-transform duration-300">send</span>
+                Enviar por WhatsApp
+            </button>
+</div>
+</div>
+</div>
+<style>
+    @keyframes shimmer {
+        100% {
+            transform: translateX(100%);
+        }
+    }
+</style>
+
+</body></html>

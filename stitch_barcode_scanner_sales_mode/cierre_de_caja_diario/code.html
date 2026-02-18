@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html class="dark" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Cierre de Caja Diario</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#e44f9c", // Pink for actions/titles
+                        "secondary": "#42fae0", // Turquoise for positive balances
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#101922",
+                        "card-dark": "#192633",
+                        "border-dark": "#233648",
+                        "text-secondary": "#92adc9",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #101922; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #233648; 
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #e44f9c; 
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display antialiased min-h-screen flex flex-col overflow-hidden selection:bg-primary/30 selection:text-white">
+<header class="flex-none bg-background-light dark:bg-background-dark border-b border-border-dark pt-safe-top">
+<div class="px-4 py-3 flex items-center justify-between">
+<button class="text-white hover:text-primary transition-colors">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<div class="text-center">
+<h1 class="text-white text-lg font-bold">Cierre de Caja</h1>
+<p class="text-text-secondary text-xs">Hoy, 24 Oct 2023</p>
+</div>
+<button class="text-primary text-sm font-semibold hover:text-primary/80 transition-colors">
+                Ayuda
+            </button>
+</div>
+<div class="bg-primary/5 border-y border-primary/20 px-4 py-2 flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-primary text-sm">currency_exchange</span>
+<p class="text-primary text-sm font-medium">Tasa BCV: 35.00 Bs/USD</p>
+</div>
+</header>
+<main class="flex-1 overflow-y-auto pb-24">
+<section class="p-4 grid grid-cols-1 gap-4">
+<h2 class="text-white text-lg font-bold px-1">Resumen del Día</h2>
+<div class="grid grid-cols-2 gap-3">
+<div class="col-span-2 bg-card-dark rounded-xl p-5 border border-border-dark shadow-sm">
+<div class="flex justify-between items-start mb-2">
+<div class="p-2 bg-secondary/10 rounded-lg text-secondary">
+<span class="material-symbols-outlined">payments</span>
+</div>
+<span class="px-2 py-1 rounded bg-secondary/10 text-secondary text-xs font-bold">+12% vs ayer</span>
+</div>
+<p class="text-text-secondary text-sm font-medium">Ventas Totales</p>
+<div class="flex items-baseline gap-2 mt-1">
+<h3 class="text-white text-2xl font-bold tracking-tight">$500.00</h3>
+<span class="text-text-secondary text-sm">Bs 17,500</span>
+</div>
+</div>
+<div class="bg-card-dark rounded-xl p-4 border border-border-dark shadow-sm">
+<div class="flex items-center gap-2 mb-2">
+<span class="material-symbols-outlined text-red-400 text-xl">trending_down</span>
+<p class="text-text-secondary text-xs font-medium uppercase tracking-wider">Gastos</p>
+</div>
+<p class="text-white text-lg font-bold">$50.00</p>
+<p class="text-text-secondary text-xs">Bs 1,750</p>
+</div>
+<div class="bg-card-dark rounded-xl p-4 border border-border-dark shadow-sm relative overflow-hidden">
+<div class="absolute top-0 right-0 w-16 h-16 bg-secondary/20 rounded-full blur-xl -mr-8 -mt-8"></div>
+<div class="flex items-center gap-2 mb-2">
+<span class="material-symbols-outlined text-secondary text-xl">trending_up</span>
+<p class="text-text-secondary text-xs font-medium uppercase tracking-wider">Ganancia Neta</p>
+</div>
+<p class="text-white text-lg font-bold">$450.00</p>
+<p class="text-text-secondary text-xs">Bs 15,750</p>
+</div>
+</div>
+</section>
+<section class="px-4 pb-6">
+<h3 class="text-white text-base font-bold mb-3 px-1">Desglose por Método de Pago</h3>
+<div class="bg-card-dark rounded-xl border border-border-dark overflow-hidden">
+<div class="flex items-center justify-between p-4 border-b border-border-dark">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-[#233648] flex items-center justify-center text-white">
+<span class="material-symbols-outlined text-sm">smartphone</span>
+</div>
+<div>
+<p class="text-white text-sm font-medium">Pago Móvil</p>
+<p class="text-text-secondary text-xs">Bs 5,250.00</p>
+</div>
+</div>
+<p class="text-white font-semibold">$150.00</p>
+</div>
+<div class="flex items-center justify-between p-4 border-b border-border-dark">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-[#233648] flex items-center justify-center text-white">
+<span class="material-symbols-outlined text-sm">credit_card</span>
+</div>
+<div>
+<p class="text-white text-sm font-medium">Punto de Venta</p>
+<p class="text-text-secondary text-xs">Bs 7,000.00</p>
+</div>
+</div>
+<p class="text-white font-semibold">$200.00</p>
+</div>
+<div class="flex items-center justify-between p-4 border-b border-border-dark">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-[#233648] flex items-center justify-center text-white">
+<span class="material-symbols-outlined text-sm">attach_money</span>
+</div>
+<div>
+<p class="text-white text-sm font-medium">Efectivo USD (Sistema)</p>
+<p class="text-text-secondary text-xs">Reportado en ventas</p>
+</div>
+</div>
+<p class="text-white font-semibold">$100.00</p>
+</div>
+<div class="flex items-center justify-between p-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-[#233648] flex items-center justify-center text-white">
+<span class="material-symbols-outlined text-sm">money_bag</span>
+</div>
+<div>
+<p class="text-white text-sm font-medium">Efectivo Bs (Sistema)</p>
+<p class="text-text-secondary text-xs">Reportado en ventas</p>
+</div>
+</div>
+<p class="text-white font-semibold">Bs 1,750.00</p>
+</div>
+</div>
+</section>
+<section class="px-4 pb-8">
+<h3 class="text-white text-base font-bold mb-3 px-1 flex items-center gap-2">
+                Conteo de Efectivo
+                <span class="px-2 py-0.5 rounded-full bg-yellow-500/20 text-yellow-500 text-[10px] font-bold uppercase tracking-wide">Acción Requerida</span>
+</h3>
+<div class="space-y-4">
+<div class="bg-card-dark p-4 rounded-xl border border-border-dark focus-within:ring-2 focus-within:ring-secondary focus-within:border-secondary transition-all">
+<label class="block text-text-secondary text-xs font-medium mb-1 uppercase tracking-wide">Efectivo Real en Caja (USD)</label>
+<div class="flex items-center justify-between">
+<span class="text-white text-xl font-bold mr-2">$</span>
+<input class="w-full bg-transparent text-white text-xl font-bold placeholder-gray-600 border-none p-0 focus:ring-0 text-right" placeholder="0.00" type="number" value="100.00"/>
+</div>
+<div class="mt-2 pt-2 border-t border-dashed border-border-dark flex justify-between items-center text-xs">
+<span class="text-text-secondary">Esperado: $100.00</span>
+<span class="text-secondary font-medium flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">check_circle</span>
+                            Cuadrado
+                        </span>
+</div>
+</div>
+<div class="bg-card-dark p-4 rounded-xl border border-red-500/50 focus-within:ring-2 focus-within:ring-red-500 focus-within:border-red-500 transition-all bg-red-500/5">
+<label class="block text-red-300 text-xs font-medium mb-1 uppercase tracking-wide">Efectivo Real en Caja (Bs)</label>
+<div class="flex items-center justify-between">
+<span class="text-white text-xl font-bold mr-2">Bs</span>
+<input class="w-full bg-transparent text-white text-xl font-bold placeholder-gray-600 border-none p-0 focus:ring-0 text-right" placeholder="0.00" type="number" value="1700.00"/>
+</div>
+<div class="mt-2 pt-2 border-t border-dashed border-red-500/30 flex justify-between items-center text-xs">
+<span class="text-red-300">Esperado: Bs 1,750.00</span>
+<span class="text-red-500 font-bold flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">warning</span>
+                            Faltante: -50.00 Bs
+                        </span>
+</div>
+</div>
+</div>
+<div class="mt-4">
+<label class="block text-text-secondary text-xs font-medium mb-2 px-1">Notas del Cierre (Opcional)</label>
+<textarea class="w-full bg-card-dark border border-border-dark rounded-lg p-3 text-white text-sm placeholder-gray-600 focus:border-primary focus:ring-1 focus:ring-primary resize-none h-20" placeholder="Escribe alguna observación sobre el descuadre..."></textarea>
+</div>
+</section>
+<div class="h-20"></div>
+</main>
+<div class="fixed bottom-[72px] left-0 w-full px-4 py-4 bg-gradient-to-t from-background-dark via-background-dark to-transparent z-10">
+<button class="w-full bg-primary hover:bg-primary/90 text-white font-bold py-3.5 rounded-lg shadow-lg shadow-primary/20 flex items-center justify-center gap-2 transition-all active:scale-[0.98]">
+<span class="material-symbols-outlined">lock</span>
+            Confirmar y Cerrar Jornada
+        </button>
+</div>
+<nav class="fixed bottom-0 w-full z-20 border-t border-border-dark bg-card-dark px-4 pb-safe-bottom pt-2 h-[72px]">
+<div class="flex justify-between items-center h-full pb-2">
+<a class="flex flex-1 flex-col items-center justify-center gap-1 text-text-secondary hover:text-white transition-colors group" href="#">
+<span class="material-symbols-outlined text-2xl group-hover:scale-110 transition-transform">home</span>
+<p class="text-[10px] font-medium">Inicio</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-center gap-1 text-text-secondary hover:text-white transition-colors group" href="#">
+<span class="material-symbols-outlined text-2xl group-hover:scale-110 transition-transform">inventory_2</span>
+<p class="text-[10px] font-medium">Inventario</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-center gap-1 text-primary relative group" href="#">
+<div class="absolute -top-10 bg-primary rounded-full p-3 border-4 border-background-dark shadow-lg shadow-primary/30 group-hover:-translate-y-1 transition-transform">
+<span class="material-symbols-outlined text-white text-2xl">point_of_sale</span>
+</div>
+<div class="h-6"></div> 
+<p class="text-[10px] font-bold">Caja</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-center gap-1 text-text-secondary hover:text-white transition-colors group" href="#">
+<span class="material-symbols-outlined text-2xl group-hover:scale-110 transition-transform">analytics</span>
+<p class="text-[10px] font-medium">Reportes</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-center gap-1 text-text-secondary hover:text-white transition-colors group" href="#">
+<span class="material-symbols-outlined text-2xl group-hover:scale-110 transition-transform">settings</span>
+<p class="text-[10px] font-medium">Ajustes</p>
+</a>
+</div>
+</nav>
+</body></html>

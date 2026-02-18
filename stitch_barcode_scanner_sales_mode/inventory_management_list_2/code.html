@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html class="dark" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Lista de Gestión de Inventario</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#e44f9c","secondary": "#42fae0","background-light": "#f6f7f8",
+                        "background-dark": "#101922",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-white antialiased">
+<div class="relative flex h-screen w-full flex-col bg-background-light dark:bg-background-dark overflow-hidden mx-auto max-w-md shadow-2xl border-x border-slate-800">
+<div class="flex items-center justify-between p-4 pb-2 pt-12 bg-background-light dark:bg-background-dark sticky top-0 z-10">
+<h2 class="text-2xl font-bold leading-tight tracking-[-0.015em]">Inventario CUADRA</h2>
+<button class="flex items-center justify-center w-10 h-10 rounded-full bg-slate-200 dark:bg-[#233648] text-slate-600 dark:text-white hover:bg-slate-300 dark:hover:bg-[#2f455a] transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+</div>
+<div class="px-4 py-2 bg-background-light dark:bg-background-dark sticky top-[80px] z-10">
+<label class="flex flex-col h-12 w-full">
+<div class="flex w-full flex-1 items-stretch rounded-xl h-full shadow-sm bg-white dark:bg-[#233648] border-2 border-transparent focus-within:border-primary transition-colors">
+<div class="flex items-center justify-center pl-4 pr-2 text-slate-400 dark:text-[#92adc9]">
+<span class="material-symbols-outlined">search</span>
+</div>
+<input class="flex w-full min-w-0 flex-1 bg-transparent border-none text-slate-900 dark:text-white focus:outline-none focus:ring-0 placeholder:text-slate-400 dark:placeholder:text-[#92adc9] text-base font-normal leading-normal" placeholder="Buscar productos o escanear..."/>
+<button class="flex items-center justify-center px-4 text-primary hover:text-pink-400 transition-colors">
+<span class="material-symbols-outlined">barcode_scanner</span>
+</button>
+</div>
+</label>
+</div>
+<div class="flex gap-2 px-4 py-3 overflow-x-auto no-scrollbar pb-4">
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full bg-primary text-white px-4 shadow-md shadow-primary/20 hover:bg-pink-600 transition-colors">
+<p class="text-sm font-medium leading-normal">Todos</p>
+</button>
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full bg-white dark:bg-[#233648] border border-slate-200 dark:border-transparent px-4 hover:border-secondary hover:text-secondary dark:hover:text-secondary transition-colors">
+<p class="text-slate-700 dark:text-white text-sm font-medium leading-normal group-hover:text-secondary">Stock Bajo</p>
+</button>
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full bg-white dark:bg-[#233648] border border-slate-200 dark:border-transparent px-4 hover:border-secondary hover:text-secondary dark:hover:text-secondary transition-colors">
+<p class="text-slate-700 dark:text-white text-sm font-medium leading-normal">Agotado</p>
+</button>
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full bg-white dark:bg-[#233648] border border-slate-200 dark:border-transparent px-4 hover:border-secondary hover:text-secondary dark:hover:text-secondary transition-colors">
+<p class="text-slate-700 dark:text-white text-sm font-medium leading-normal">Categorías</p>
+</button>
+</div>
+<div class="flex-1 overflow-y-auto px-4 pb-24 space-y-4">
+<div class="flex gap-4 p-3 rounded-xl bg-white dark:bg-[#192633] shadow-sm border border-slate-100 dark:border-[#233648] hover:border-secondary/30 transition-colors cursor-pointer group">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-lg w-[72px] h-[72px] shrink-0 bg-slate-200" data-alt="Bag of coffee beans" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuA9rIaaBSUCqAqcWKvmlPjZuToqWHORGJrStjGosog-e9J_8bIQodbHN5DTxPMuBHpfD_CUYL1hb5UxK0aFKDTFnd9pRYR4GBp4SBRDOMsau1AIJHguDnwuDNQYdlUrMIsqlH4s5yKEEhC4u157WqNr22OLxVc7n0FXq8DjvCgdLRuzIQPhpuzP4BsUXjaaK01KBHdPh0B0rqBCiY-Pv1IWQyLNXLwR6twyB5HI4oSQj6Goq8JJw3QNYDFkP86p-slX8zqKSn43Tnw");'></div>
+<div class="flex flex-1 flex-col justify-between">
+<div>
+<div class="flex justify-between items-start">
+<p class="text-slate-900 dark:text-white text-base font-bold leading-tight line-clamp-1 group-hover:text-secondary transition-colors">Café Premium 500g</p>
+<span class="material-symbols-outlined text-slate-400 text-[20px]">more_vert</span>
+</div>
+<p class="text-slate-500 dark:text-[#92adc9] text-xs font-medium mt-0.5">SKU: 890123</p>
+</div>
+<div class="flex justify-between items-end mt-2">
+<div class="flex items-center gap-2">
+<span class="inline-flex items-center rounded bg-teal-50 dark:bg-teal-500/10 px-2 py-0.5 text-xs font-medium text-teal-700 dark:text-teal-300 ring-1 ring-inset ring-teal-600/20 dark:ring-teal-400/20">
+                                145 unidades
+                            </span>
+</div>
+<div class="text-right">
+<p class="text-primary text-base font-bold leading-none">$1.20</p>
+<p class="text-slate-400 dark:text-[#6b8299] text-xs font-normal leading-normal mt-0.5">Bs 45.00</p>
+</div>
+</div>
+</div>
+</div>
+<div class="flex gap-4 p-3 rounded-xl bg-white dark:bg-[#192633] shadow-sm border border-slate-100 dark:border-[#233648] hover:border-secondary/30 transition-colors cursor-pointer group">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-lg w-[72px] h-[72px] shrink-0 bg-slate-200" data-alt="Bottle of cooking oil" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuA0o_8Wzo6kVd5zoyUMM2M9aVMV1rkdjNoyGUdkKFG7zYVCUzKZtKEyj1OFkKRBwWREufD4zna0ktxWQTOW8vXLrxVXDDGFi77uBB1WAZ9JAv5Jmk1dFcPYtRPY9bI0IxnoqLM5yKk37TrX4ZlfyPOSbb9eERszWWU2aCgsfo8voMz1K-sLUGJ4zOD_w9i62nehkkXcolq9TuqKwUIhijH6oorgLCgURbHcZkzOVxslgqqgRztN-mIexCgXkZGJnGj-7MFdjySbueI");'></div>
+<div class="flex flex-1 flex-col justify-between">
+<div>
+<div class="flex justify-between items-start">
+<p class="text-slate-900 dark:text-white text-base font-bold leading-tight line-clamp-1 group-hover:text-secondary transition-colors">Aceite Girasol 1L</p>
+<span class="material-symbols-outlined text-slate-400 text-[20px]">more_vert</span>
+</div>
+<p class="text-slate-500 dark:text-[#92adc9] text-xs font-medium mt-0.5">SKU: 890124</p>
+</div>
+<div class="flex justify-between items-end mt-2">
+<div class="flex items-center gap-2">
+<span class="inline-flex items-center rounded bg-amber-50 dark:bg-amber-500/10 px-2 py-0.5 text-xs font-medium text-amber-700 dark:text-amber-400 ring-1 ring-inset ring-amber-600/20 dark:ring-amber-400/20">
+                                Stock Bajo: 12
+                            </span>
+</div>
+<div class="text-right">
+<p class="text-secondary text-base font-bold leading-none">$3.50</p>
+<p class="text-slate-400 dark:text-[#6b8299] text-xs font-normal leading-normal mt-0.5">Bs 131.25</p>
+</div>
+</div>
+</div>
+</div>
+<div class="flex gap-4 p-3 rounded-xl bg-white dark:bg-[#192633] shadow-sm border border-slate-100 dark:border-[#233648] hover:border-secondary/30 transition-colors cursor-pointer group">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-lg w-[72px] h-[72px] shrink-0 bg-slate-200" data-alt="Package of white rice" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuD1TWX3BGBYep_vCp3mFQzVTMQK7R57Cfp9JOoj3R5IEy2M9BrYwoUjiKbOZ8f1yg1iGUmziBvnZxprb_Hz5uEXz9P5v8OnmScRqLpuVeQ1yh1zHKAz4CWZS9YDsCn3HmYKpdA8odL9Q8Uz7sLKMgccTTr9x4_RdMt8wgK69sjtXDZHvxigS5KUn2P6WWjivVHHsZkvo1L10pQllM-EvCO6DqSJxZEIo8PpWsgplTyb2WYArpHDBB-xsEVGRmhDHllbHsoIm-U0Rxw");'></div>
+<div class="flex flex-1 flex-col justify-between">
+<div>
+<div class="flex justify-between items-start">
+<p class="text-slate-900 dark:text-white text-base font-bold leading-tight line-clamp-1 group-hover:text-secondary transition-colors">Arroz Blanco 1kg</p>
+<span class="material-symbols-outlined text-slate-400 text-[20px]">more_vert</span>
+</div>
+<p class="text-slate-500 dark:text-[#92adc9] text-xs font-medium mt-0.5">SKU: 890125</p>
+</div>
+<div class="flex justify-between items-end mt-2">
+<div class="flex items-center gap-2">
+<span class="inline-flex items-center rounded bg-teal-50 dark:bg-teal-500/10 px-2 py-0.5 text-xs font-medium text-teal-700 dark:text-teal-300 ring-1 ring-inset ring-teal-600/20 dark:ring-teal-400/20">
+                                85 unidades
+                            </span>
+</div>
+<div class="text-right">
+<p class="text-secondary text-base font-bold leading-none">$0.95</p>
+<p class="text-slate-400 dark:text-[#6b8299] text-xs font-normal leading-normal mt-0.5">Bs 35.60</p>
+</div>
+</div>
+</div>
+</div>
+<div class="flex gap-4 p-3 rounded-xl bg-white dark:bg-[#192633] shadow-sm border border-slate-100 dark:border-[#233648] opacity-75 hover:opacity-100 transition-opacity cursor-pointer group">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-lg w-[72px] h-[72px] shrink-0 grayscale bg-slate-200" data-alt="Can of tomato sauce" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAOhB6eBvuyqyvjUs11oj8PhPyMe4IkZCpQrDtBIPDgmRGpxhZmJZJ44zCjYZlgjprY_jmKTG00tzcx6ih7N5CkBAvkNCljFTqJOBKcJBAgYxsIr0e7n4BdGXizoxa2vtWBAs51w7VgrLTWfE54hLVLjgKPb0DGw-b8qnrG6v-hAsCPPoL658EdRW0Arq8J-_ZMqTrLprWloaqttZ-SuzwRi3wJLxlnwPFxfhgQmQcxkMDSK2bWpL12EoOwKVcrNHp_t0kdX8rVLx8");'></div>
+<div class="flex flex-1 flex-col justify-between">
+<div>
+<div class="flex justify-between items-start">
+<p class="text-slate-900 dark:text-white text-base font-bold leading-tight line-clamp-1 group-hover:text-secondary transition-colors">Salsa de Tomate 300g</p>
+<span class="material-symbols-outlined text-slate-400 text-[20px]">more_vert</span>
+</div>
+<p class="text-slate-500 dark:text-[#92adc9] text-xs font-medium mt-0.5">SKU: 890126</p>
+</div>
+<div class="flex justify-between items-end mt-2">
+<div class="flex items-center gap-2">
+<span class="inline-flex items-center rounded bg-red-50 dark:bg-red-500/10 px-2 py-0.5 text-xs font-medium text-red-700 dark:text-red-400 ring-1 ring-inset ring-red-600/20 dark:ring-red-400/20">
+                                Agotado
+                            </span>
+</div>
+<div class="text-right">
+<p class="text-primary text-base font-bold leading-none">$1.10</p>
+<p class="text-slate-400 dark:text-[#6b8299] text-xs font-normal leading-normal mt-0.5">Bs 41.25</p>
+</div>
+</div>
+</div>
+</div>
+<div class="flex gap-4 p-3 rounded-xl bg-white dark:bg-[#192633] shadow-sm border border-slate-100 dark:border-[#233648] hover:border-secondary/30 transition-colors cursor-pointer group">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-lg w-[72px] h-[72px] shrink-0 bg-slate-200" data-alt="Box of apple juice" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBb44lCFUR28N6IuOPoxGtpuHnWf7hfP-hBlrTtVvhbqnbEFOZSNF1v-1S_nF5pUXtWs0_JCWYU4Rg4KH_mb3bHUqpcpZx3ZCA_legcsEU7zWtF_VckggiMzPbQ6EqqR0a4ryn9c5_WeYRG1YAwiOvHksObyB7xTAqvANG407ieW8eiKKR1qI6NBQcDUmK9NR78p1oCqjZASJyH8gDr2n5yDt8DVmSZf3S4cA6MJMjBtEIMRsPHIw2jDtn4NjPbgqUnKQlOmhTFshk");'></div>
+<div class="flex flex-1 flex-col justify-between">
+<div>
+<div class="flex justify-between items-start">
+<p class="text-slate-900 dark:text-white text-base font-bold leading-tight line-clamp-1 group-hover:text-secondary transition-colors">Jugo de Manzana 1L</p>
+<span class="material-symbols-outlined text-slate-400 text-[20px]">more_vert</span>
+</div>
+<p class="text-slate-500 dark:text-[#92adc9] text-xs font-medium mt-0.5">SKU: 890127</p>
+</div>
+<div class="flex justify-between items-end mt-2">
+<div class="flex items-center gap-2">
+<span class="inline-flex items-center rounded bg-teal-50 dark:bg-teal-500/10 px-2 py-0.5 text-xs font-medium text-teal-700 dark:text-teal-300 ring-1 ring-inset ring-teal-600/20 dark:ring-teal-400/20">
+                                42 unidades
+                            </span>
+</div>
+<div class="text-right">
+<p class="text-secondary text-base font-bold leading-none">$2.15</p>
+<p class="text-slate-400 dark:text-[#6b8299] text-xs font-normal leading-normal mt-0.5">Bs 80.60</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<button class="absolute bottom-24 right-5 flex flex-col items-center justify-center z-20 transition-transform active:scale-95 group">
+<div class="h-14 w-14 rounded-full bg-gradient-to-tr from-primary to-pink-400 text-white shadow-lg shadow-primary/40 flex items-center justify-center">
+<span class="material-symbols-outlined text-[28px]">photo_camera</span>
+</div>
+<span class="bg-black/70 text-white text-[10px] px-2 py-1 rounded-full mt-1 opacity-0 group-hover:opacity-100 transition-opacity">Escanear</span>
+</button>
+<div class="absolute bottom-0 w-full z-20 border-t border-slate-200 dark:border-[#233648] bg-white dark:bg-[#192633]">
+<div class="flex gap-2 px-2 pb-6 pt-2">
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-slate-400 dark:text-[#92adc9] hover:text-primary dark:hover:text-secondary transition-colors" href="#">
+<span class="material-symbols-outlined">bar_chart</span>
+<p class="text-[10px] sm:text-xs font-medium leading-normal tracking-[0.015em]">Resumen</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-end gap-1 rounded-full text-primary" href="#">
+<span class="material-symbols-outlined fill-current">inventory_2</span>
+<p class="text-[10px] sm:text-xs font-medium leading-normal tracking-[0.015em]">Inventario</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-slate-400 dark:text-[#92adc9] hover:text-primary dark:hover:text-secondary transition-colors" href="#">
+<span class="material-symbols-outlined">attach_money</span>
+<p class="text-[10px] sm:text-xs font-medium leading-normal tracking-[0.015em]">Ventas</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-slate-400 dark:text-[#92adc9] hover:text-primary dark:hover:text-secondary transition-colors" href="#">
+<span class="material-symbols-outlined">description</span>
+<p class="text-[10px] sm:text-xs font-medium leading-normal tracking-[0.015em]">Reportes</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-slate-400 dark:text-[#92adc9] hover:text-primary dark:hover:text-secondary transition-colors" href="#">
+<span class="material-symbols-outlined">settings</span>
+<p class="text-[10px] sm:text-xs font-medium leading-normal tracking-[0.015em]">Ajustes</p>
+</a>
+</div>
+</div>
+</div>
+</body></html>

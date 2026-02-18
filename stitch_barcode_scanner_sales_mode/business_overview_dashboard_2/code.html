@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html class="dark" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Tablero de Resumen CUADRA</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#e44f9c", // Pink as requested
+                        "accent": "#42fae0",  // Turquoise as requested
+                        "accent-light": "#7af9e6",
+                        "primary-light": "#ff69b4",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#101922",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"],
+                    },
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings:
+            'FILL' 0,
+            'wght' 400,
+            'GRAD' 0,
+            'opsz' 24
+        }
+    </style>
+<style>
+        body {
+          min-height: max(884px, 100dvh);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-white antialiased overflow-x-hidden">
+<div class="relative flex min-h-screen w-full flex-col max-w-md mx-auto bg-background-light dark:bg-background-dark border-x border-slate-200 dark:border-slate-800 shadow-2xl">
+<header class="sticky top-0 z-10 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-md px-4 pt-6 pb-2">
+<div class="flex items-center justify-between mb-4">
+<div class="flex items-center gap-3">
+<div class="relative">
+<div class="h-10 w-10 rounded-full bg-slate-200 dark:bg-slate-700 bg-center bg-cover border-2 border-primary" data-alt="Business owner profile picture" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBKzDqY2M4GnvJVg7ebtXjCJLhLWGR9RrVxtrW5U9Wlj7mtJuNfchTGTS_YMtPpWTzqnLAkGKw7W1d-JxdVKzzJUEq7ezIQj5u42Yd7VHlXvBlenSXv629fyP_6YlEG2iXZax2CvQNPHdQj9JIv2w3jk10eG5ly8s_wqMM3GOtsqV1q4VC6EGzNRPfURMKVuwRzlv8W28LFNiuH4lmXowKIiPdeDlbrHXmrTzevUfYuVQTwh8-ZS0TxczOMS0AKS4cqL4j9qVNEek8");'></div>
+<div class="absolute bottom-0 right-0 h-3 w-3 rounded-full bg-accent border-2 border-background-light dark:border-background-dark"></div>
+</div>
+<div>
+<p class="text-xs text-slate-500 dark:text-slate-400 font-medium">Buenos días,</p>
+<h1 class="text-lg font-bold leading-tight flex items-center gap-1">
+    Arepa King CA
+    <span class="text-[10px] bg-primary text-white px-1.5 py-0.5 rounded ml-1 tracking-wider font-bold">JASA</span>
+</h1>
+</div>
+</div>
+<button class="p-2 rounded-full text-slate-500 hover:bg-slate-200 dark:text-slate-400 dark:hover:bg-slate-800 transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+</div>
+<div class="relative w-full overflow-hidden rounded-xl bg-gradient-to-br from-slate-900 to-slate-800 dark:from-slate-800 dark:to-slate-900 p-4 shadow-lg border border-slate-200 dark:border-slate-700/50">
+<div class="flex items-center justify-between relative z-10">
+<div>
+<div class="flex items-center gap-2 mb-1">
+<span class="text-slate-400 text-xs uppercase tracking-wider font-semibold">Tasa Oficial (BCV)</span>
+<span class="flex h-1.5 w-1.5 rounded-full bg-accent animate-pulse"></span>
+</div>
+<div class="flex items-baseline gap-2">
+<span class="text-2xl font-bold text-white">36.54</span>
+<span class="text-sm font-medium text-slate-400">Bs/USD</span>
+</div>
+</div>
+<div class="text-right">
+<div class="bg-accent/20 text-accent px-2 py-1 rounded text-xs font-bold inline-flex items-center gap-1 border border-accent/20">
+<span class="material-symbols-outlined text-[14px]">trending_up</span>
+                        +0.12%
+                    </div>
+<p class="text-[10px] text-slate-500 mt-2">Actualizado: Hoy, 9:00 AM</p>
+</div>
+</div>
+<div class="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-primary/20 blur-2xl"></div>
+<div class="absolute -left-6 -bottom-6 h-20 w-20 rounded-full bg-accent/10 blur-xl"></div>
+</div>
+</header>
+<main class="flex-1 px-4 py-2 space-y-6 pb-24">
+<section>
+<div class="grid grid-cols-2 gap-3">
+<button class="group flex flex-col items-start gap-3 rounded-xl bg-gradient-to-br from-primary to-primary-light p-4 shadow-lg shadow-primary/25 hover:brightness-110 transition-all active:scale-95">
+<div class="rounded-full bg-white/20 p-2 text-white group-hover:bg-white/30 transition-colors">
+<span class="material-symbols-outlined">qr_code_scanner</span>
+</div>
+<div class="text-left">
+<p class="text-sm font-bold text-white">Escanear para Vender</p>
+<p class="text-[10px] text-white/80">Nueva Transacción</p>
+</div>
+</button>
+<button class="group flex flex-col items-start gap-3 rounded-xl bg-white dark:bg-slate-800 p-4 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-all active:scale-95 border border-slate-100 dark:border-slate-700 shadow-sm">
+<div class="rounded-full bg-slate-100 dark:bg-slate-700 p-2 text-slate-600 dark:text-slate-200 group-hover:bg-slate-200 dark:group-hover:bg-slate-600 transition-colors">
+<span class="material-symbols-outlined">inventory_2</span>
+</div>
+<div class="text-left">
+<p class="text-sm font-bold text-slate-900 dark:text-white">Agregar Inventario</p>
+<p class="text-[10px] text-slate-500 dark:text-slate-400">Actualizar Stock</p>
+</div>
+</button>
+</div>
+</section>
+<section class="space-y-4">
+<div class="flex items-center justify-between">
+<h2 class="text-lg font-bold">Resumen Financiero</h2>
+<button class="text-primary text-sm font-semibold hover:underline">Ver Reporte</button>
+</div>
+<div class="space-y-3">
+<div class="rounded-xl bg-white dark:bg-slate-800 p-4 border border-slate-100 dark:border-slate-700 shadow-sm relative overflow-hidden">
+<div class="flex justify-between items-start mb-2">
+<div class="flex items-center gap-2">
+<div class="p-1.5 rounded-lg bg-accent/10 text-emerald-600 dark:text-accent">
+<span class="material-symbols-outlined text-[20px]">payments</span>
+</div>
+<span class="text-sm font-medium text-slate-600 dark:text-slate-300">Ventas Totales</span>
+</div>
+<span class="text-xs font-bold text-emerald-600 dark:text-accent bg-emerald-50 dark:bg-accent/10 px-2 py-0.5 rounded-full border border-emerald-100 dark:border-accent/20">+12%</span>
+</div>
+<div class="flex flex-col">
+<span class="text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white">$4,200.00</span>
+<span class="text-sm font-medium text-slate-500 dark:text-slate-400">Bs 153,468.00</span>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-3">
+<div class="rounded-xl bg-white dark:bg-slate-800 p-4 border border-slate-100 dark:border-slate-700 shadow-sm">
+<div class="flex items-center gap-2 mb-3">
+<div class="p-1.5 rounded-lg bg-red-50 dark:bg-red-900/20 text-red-500 dark:text-red-400">
+<span class="material-symbols-outlined text-[18px]">trending_down</span>
+</div>
+<span class="text-xs font-medium text-slate-600 dark:text-slate-300">Gastos</span>
+</div>
+<div class="flex flex-col">
+<span class="text-lg font-bold text-slate-900 dark:text-white">$1,100</span>
+<span class="text-xs text-slate-500 dark:text-slate-400">Bs 40,194</span>
+</div>
+</div>
+<div class="rounded-xl bg-white dark:bg-slate-800 p-4 border border-primary/20 shadow-sm relative overflow-hidden">
+<div class="absolute inset-0 bg-primary/5 dark:bg-primary/10"></div>
+<div class="relative z-10">
+<div class="flex items-center gap-2 mb-3">
+<div class="p-1.5 rounded-lg bg-primary/20 text-primary">
+<span class="material-symbols-outlined text-[18px]">account_balance_wallet</span>
+</div>
+<span class="text-xs font-medium text-slate-600 dark:text-slate-300">Ganancia Neta</span>
+</div>
+<div class="flex flex-col">
+<span class="text-lg font-bold text-primary">$3,100</span>
+<span class="text-xs text-slate-500 dark:text-slate-400">Bs 113,274</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section>
+<h3 class="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3 px-1">Actividad Reciente</h3>
+<div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-700 overflow-hidden">
+<div class="divide-y divide-slate-100 dark:divide-slate-700">
+<div class="flex items-center p-3 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
+<div class="h-10 w-10 rounded-full bg-primary-light/10 flex items-center justify-center text-primary mr-3">
+<span class="material-symbols-outlined text-[20px]">shopping_cart</span>
+</div>
+<div class="flex-1">
+<p class="text-sm font-bold text-slate-900 dark:text-white">Orden #2034</p>
+<p class="text-xs text-slate-500 dark:text-slate-400">Hoy, 10:23 AM</p>
+</div>
+<div class="text-right">
+<p class="text-sm font-bold text-emerald-600 dark:text-accent">+$24.50</p>
+<p class="text-[10px] text-slate-400">Bs 895.23</p>
+</div>
+</div>
+<div class="flex items-center p-3 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
+<div class="h-10 w-10 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-slate-500 dark:text-slate-300 mr-3">
+<span class="material-symbols-outlined text-[20px]">inventory</span>
+</div>
+<div class="flex-1">
+<p class="text-sm font-bold text-slate-900 dark:text-white">Harina P.A.N. (Reposición)</p>
+<p class="text-xs text-slate-500 dark:text-slate-400">Ayer, 4:15 PM</p>
+</div>
+<div class="text-right">
+<p class="text-sm font-bold text-slate-900 dark:text-white">-$120.00</p>
+<p class="text-[10px] text-slate-400">Bs 4,384.80</p>
+</div>
+</div>
+</div>
+<div class="p-2 border-t border-slate-100 dark:border-slate-700">
+<button class="w-full py-2 text-xs font-semibold text-primary text-center hover:text-primary-light transition-colors">Ver Todas las Transacciones</button>
+</div>
+</div>
+</section>
+</main>
+<nav class="fixed bottom-0 w-full max-w-md z-20 border-t border-slate-200 dark:border-slate-800 bg-background-light dark:bg-background-dark pb-safe">
+<div class="flex justify-around items-center px-2 py-3">
+<a class="flex flex-col items-center gap-1 group w-16" href="#">
+<div class="relative">
+<span class="material-symbols-outlined text-primary group-hover:scale-110 transition-transform">dashboard</span>
+<span class="absolute -bottom-2 left-1/2 -translate-x-1/2 h-1 w-1 rounded-full bg-primary"></span>
+</div>
+<span class="text-[10px] font-bold text-primary">Resumen</span>
+</a>
+<a class="flex flex-col items-center gap-1 group w-16 text-slate-400 hover:text-primary dark:hover:text-white transition-colors" href="#">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">inventory_2</span>
+<span class="text-[10px] font-medium">Inventario</span>
+</a>
+<div class="relative -top-6">
+<button class="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-tr from-primary to-primary-light text-white shadow-lg shadow-primary/40 hover:shadow-primary/60 transition-all hover:scale-105 active:scale-95 border-4 border-background-light dark:border-background-dark">
+<span class="material-symbols-outlined text-[28px]">qr_code_scanner</span>
+</button>
+</div>
+<a class="flex flex-col items-center gap-1 group w-16 text-slate-400 hover:text-primary dark:hover:text-white transition-colors" href="#">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">sell</span>
+<span class="text-[10px] font-medium">Ventas</span>
+</a>
+<a class="flex flex-col items-center gap-1 group w-16 text-slate-400 hover:text-primary dark:hover:text-white transition-colors" href="#">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">receipt_long</span>
+<span class="text-[10px] font-medium">Fiados</span>
+</a>
+</div>
+</nav>
+</div>
+</body></html>

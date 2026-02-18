@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CUADRA - Gestión Inteligente</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#e44ea1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/9425/9425832.png">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Manrope:wght@200..800&display=swap"
+        rel="stylesheet">
+    <!-- Material Symbols -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#e44ea1",
+                        "primary-light": "#ff69b4",
+                        "secondary": "#42fae0",
+                        "accent": "#42fae0",
+                        "background-light": "#f8f6f7",
+                        "background-dark": "#101922",
+                        "on-primary": "#ffffff",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans", "sans-serif"],
+                        "manrope": ["Manrope", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+    <style>
+        .cuadra-gradient {
+            background: linear-gradient(135deg, #e44ea1 0%, #d43d91 40%, #42fae0 100%);
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(12px);
+            border: 1px border rgba(255, 255, 255, 0.2);
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .view {
+            display: none;
+            height: 100vh;
+            width: 100%;
+            overflow-y: auto;
+        }
+
+        .view.active {
+            display: block;
+        }
+    </style>
+    <!-- Custom Style -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body class="bg-background-light dark:bg-background-dark antialiased overflow-hidden">
+    <!-- View: Onboarding -->
+    <main id="view-onboarding" class="view active relative cuadra-gradient text-white flex flex-col justify-between">
+        <div
+            class="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] mix-blend-overlay pointer-events-none">
+        </div>
+        <div
+            class="absolute -top-20 -right-20 w-64 h-64 bg-secondary rounded-full blur-[80px] opacity-20 animate-pulse">
+        </div>
+        <div class="flex-grow flex flex-col items-center justify-center px-6 relative z-10 pt-10">
+            <div class="flex flex-col items-center gap-6">
+                <!-- Logo -->
+                <div
+                    class="w-24 h-24 sm:w-32 sm:h-32 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center shadow-lg border border-white/30 transform rotate-3">
+                    <span class="material-symbols-outlined text-white !text-6xl sm:!text-7xl">grid_view</span>
+                </div>
+                <h1 class="text-5xl sm:text-6xl font-extrabold tracking-tight text-center drop-shadow-sm">CUADRA</h1>
+                <div
+                    class="flex items-center gap-2 mt-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full border border-white/20">
+                    <span class="material-symbols-outlined !text-[18px]">verified</span>
+                    <p class="text-sm font-medium tracking-wide">Powered by <span class="font-bold">JASA</span></p>
+                </div>
+            </div>
+            <p class="text-white/80 text-center mt-12 max-w-xs text-lg font-light leading-relaxed">Gestión inteligente
+                para tu negocio,
+                simplificada al máximo. </p>
+        </div>
+        <div class="w-full px-6 pb-12 pt-6 relative z-10 flex flex-col gap-4">
+            <button onclick="navigateTo('view-dashboard')"
+                class="w-full bg-white text-primary hover:bg-white/95 active:scale-[0.98] transition-all duration-200 h-14 rounded-full font-bold text-lg shadow-xl flex items-center justify-center gap-2 group"><span>Comenzar</span><span
+                    class="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span></button>
+            <button
+                class="w-full h-12 flex items-center justify-center text-white/90 hover:text-white font-medium text-sm transition-colors">¿Ya
+                tienes una cuenta? <span class="underline ml-1">Inicia sesión</span></button>
+        </div>
+    </main>
+    <!-- View: Dashboard (Empty Shell for now) -->
+    <main id="view-dashboard" class="view bg-background-light dark:bg-background-dark dark:text-white">
+        <!-- Dashboard Content will be injected here -->
+        <div class="p-6 text-center">
+            <h2 class="text-2xl font-bold">Cargando Tablero...</h2>
+        </div>
+    </main>
+
+    <!-- View: Inventory -->
+    <main id="view-inventory" class="view bg-background-light dark:bg-background-dark dark:text-white">
+        <!-- Inventory Content will be injected here -->
+    </main>
+
+    <!-- View: Sales -->
+    <main id="view-sales" class="view bg-background-light dark:bg-background-dark dark:text-white">
+        <!-- Sales Content will be injected here -->
+    </main>
+
+    <!-- View: Debts -->
+    <main id="view-debts" class="view bg-background-light dark:bg-background-dark dark:text-white">
+        <!-- Debts Content will be injected here -->
+    </main>
+
+    <!-- View: Expenses -->
+    <main id="view-expenses" class="view bg-background-light dark:bg-background-dark dark:text-white">
+        <!-- Expenses Content will be injected here -->
+    </main>
+
+    <!-- View: Reports -->
+    <main id="view-reports" class="view bg-background-light dark:bg-background-dark dark:text-white">
+        <!-- Reports Content will be injected here -->
+    </main>
+
+    <!-- View: Cash Closure -->
+    <main id="view-closure" class="view bg-background-light dark:bg-background-dark dark:text-white">
+        <!-- Closure Content will be injected here -->
+    </main>
+
+    <!-- View: Settings -->
+    <main id="view-settings" class="view bg-background-light dark:bg-background-dark dark:text-white">
+        <!-- Settings Content will be injected here -->
+    </main>
+
+    <!-- View: Scanner -->
+    <main id="view-scanner" class="view bg-black">
+        <!-- Scanner Content will be injected here -->
+    </main>
+    <script src="js/app.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js').then(reg => {
+                    console.log('CUADRA Offline Ready (Service Worker Registered)');
+                }).catch(err => {
+                    console.log('SW registration failed: ', err);
+                });
+            });
+        }
+    </script>
+</body>
+
+</html>

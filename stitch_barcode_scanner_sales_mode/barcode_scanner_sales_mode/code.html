@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html class="dark" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Escáner para Ventas</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#137fec",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#101922",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>@keyframes scan {
+            0% { top: 0; opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { top: 100%; opacity: 0; }
+        }
+        .scan-line {
+            position: absolute;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: #137fec;
+            box-shadow: 0 0 4px #137fec;
+            animation: scan 2s linear infinite;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark min-h-screen flex flex-col font-display overflow-hidden text-white">
+<div class="fixed top-0 left-0 right-0 z-20 flex items-center justify-between p-4 pt-6 bg-gradient-to-b from-black/80 to-transparent">
+<button class="flex items-center justify-center w-10 h-10 rounded-full bg-black/40 backdrop-blur-md text-white border border-white/10">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<div class="flex items-center gap-2 px-4 py-2 bg-black/40 backdrop-blur-md rounded-full border border-white/10">
+<span class="material-symbols-outlined text-green-400 text-lg">currency_exchange</span>
+<div class="flex flex-col items-start leading-none">
+<span class="text-[10px] text-gray-400 uppercase font-bold tracking-wider">Tasa BCV</span>
+<span class="text-sm font-bold text-white">36.45 Bs/$</span>
+</div>
+</div>
+<button class="flex items-center justify-center w-10 h-10 rounded-full bg-black/40 backdrop-blur-md text-white border border-white/10">
+<span class="material-symbols-outlined">flashlight_on</span>
+</button>
+</div>
+<div class="relative flex-1 bg-black w-full overflow-hidden">
+<div class="absolute inset-0 z-0 bg-cover bg-center opacity-60" data-alt="Blurred supermarket shelf background representing camera view" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCMcuvSuBI5mIJoe8eHe2kfvVJhLtnTLKs-IhB_Hk8-g0yACJx69sAnJBvOnSHosqWkEUouKBGRYTz1MQfwtcqm8fXfP3k8dEMFKPiPUVVmZePZOoVwyAqLNukV2wWpNt8Hx5IynRfNqqMPMN8j3MeBhyb2vczUt6aGjrm8jVZosXiSqRwqGbou6f3fYVUy5KRguVlP90eXg6QgVgDO-yf25Xnq3Ey3wKUhhdh6rl2ZmXJG7j6nYokGB3dE3jm4qoSSrehCJWhF49U'); filter: grayscale(100%) contrast(120%);">
+</div>
+<div class="absolute inset-0 z-10 flex flex-col items-center justify-center">
+<div class="relative w-64 h-64 border-2 border-primary/50 rounded-xl bg-transparent shadow-[0_0_0_9999px_rgba(0,0,0,0.7)]">
+<div class="absolute top-0 left-0 w-6 h-6 border-t-4 border-l-4 border-primary -mt-1 -ml-1 rounded-tl-lg"></div>
+<div class="absolute top-0 right-0 w-6 h-6 border-t-4 border-r-4 border-primary -mt-1 -mr-1 rounded-tr-lg"></div>
+<div class="absolute bottom-0 left-0 w-6 h-6 border-b-4 border-l-4 border-primary -mb-1 -ml-1 rounded-bl-lg"></div>
+<div class="absolute bottom-0 right-0 w-6 h-6 border-b-4 border-r-4 border-primary -mb-1 -mr-1 rounded-br-lg"></div>
+<div class="scan-line"></div>
+</div>
+<p class="mt-8 text-white/80 text-sm font-medium tracking-wide bg-black/40 px-3 py-1 rounded-full backdrop-blur-sm">
+            Alinee el código en el marco
+        </p>
+</div>
+<div class="absolute bottom-32 left-0 right-0 z-10 flex justify-center">
+<button class="flex items-center gap-2 px-4 py-2 bg-background-dark/80 backdrop-blur-md border border-white/10 rounded-full text-sm font-semibold hover:bg-background-dark transition-colors">
+<span class="material-symbols-outlined text-primary text-lg">keyboard</span>
+            Ingresar código manual
+        </button>
+</div>
+</div>
+<div class="relative z-30 bg-background-dark border-t border-white/10 rounded-t-2xl shadow-2xl -mt-6">
+<div class="w-full flex justify-center pt-3 pb-1">
+<div class="w-12 h-1.5 bg-gray-600 rounded-full"></div>
+</div>
+<div class="p-5 pb-8 space-y-5">
+<div class="flex gap-4">
+<div class="relative w-20 h-20 shrink-0 bg-white rounded-lg overflow-hidden border border-white/10">
+<img alt="Paquete de harina de maíz" class="w-full h-full object-cover" data-alt="Product image of Harina P.A.N. corn flour" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDXWDUNpO9T8Uf93s7BXbi9hF7t__lb5nqVna3rXIX8smKbXDf8Hyxe5dQdpz0QGSCkFzL7zJqePsGqU3a6_86N2R32fwc9JrNkEQe9BToiMdx7aSMC9t_7KpVIcXY4FErCN_PXaokpBBH3FeDtIksFoddX1Vur3i_4xEuYRYkXASWHVFME2ce79i3nQhrHiQ9jFT4qcgSbKDzAqP0v03C9lbZmOXZjZgI1DCtEsQiaRKaAHOwzCLMpZ-vN92l2IcGHkRXrOQ4bTaw"/>
+</div>
+<div class="flex-1 flex flex-col justify-between py-0.5">
+<div>
+<h2 class="text-xl font-bold leading-tight text-white mb-1">Harina P.A.N. 1kg</h2>
+<div class="flex items-center gap-2">
+<span class="px-2 py-0.5 bg-green-500/20 text-green-400 text-xs font-bold rounded-md uppercase tracking-wider">Disponible</span>
+<span class="text-xs text-gray-400">SKU: 7590001</span>
+</div>
+</div>
+<div class="flex items-baseline gap-2 mt-1">
+<span class="text-2xl font-bold text-white tracking-tight">$1.50</span>
+<span class="text-sm font-medium text-gray-400">~ 54.67 Bs</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex items-center bg-[#192633] rounded-lg h-12 border border-white/5">
+<button class="w-10 h-full flex items-center justify-center text-gray-400 hover:text-white active:bg-white/5 rounded-l-lg transition-colors">
+<span class="material-symbols-outlined text-xl">remove</span>
+</button>
+<div class="w-10 h-full flex items-center justify-center border-x border-white/5">
+<span class="text-lg font-bold">1</span>
+</div>
+<button class="w-10 h-full flex items-center justify-center text-primary hover:text-primary/80 active:bg-white/5 rounded-r-lg transition-colors">
+<span class="material-symbols-outlined text-xl">add</span>
+</button>
+</div>
+<button class="flex-1 h-12 bg-primary hover:bg-primary/90 text-white rounded-lg font-bold text-base shadow-lg shadow-primary/20 flex items-center justify-center gap-2 transition-all active:scale-[0.98]">
+<span class="material-symbols-outlined">shopping_cart</span>
+                Añadir al Carrito
+            </button>
+</div>
+</div>
+</div>
+<div class="border-t border-[#233648] bg-[#192633] pb-6 pt-2">
+<div class="flex justify-around items-center px-4">
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-[#92adc9] group" href="#">
+<span class="material-symbols-outlined text-2xl group-hover:text-white transition-colors">dashboard</span>
+<p class="text-[10px] font-medium truncate w-full text-center">Resumen</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-[#92adc9] group" href="#">
+<span class="material-symbols-outlined text-2xl group-hover:text-white transition-colors">inventory_2</span>
+<p class="text-[10px] font-medium truncate w-full text-center">Inventario</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-primary group" href="#">
+<div class="relative">
+<span class="material-symbols-outlined text-2xl fill-current">point_of_sale</span>
+<span class="absolute -top-1 -right-1 flex h-2.5 w-2.5">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-primary"></span>
+</span>
+</div>
+<p class="text-[10px] font-bold text-white truncate w-full text-center">Ventas</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-[#92adc9] group relative" href="#">
+<span class="material-symbols-outlined text-2xl group-hover:text-white transition-colors">bar_chart</span>
+<p class="text-[10px] font-medium truncate w-full text-center">Reportes</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-[#92adc9] group" href="#">
+<span class="material-symbols-outlined text-2xl group-hover:text-white transition-colors">settings</span>
+<p class="text-[10px] font-medium truncate w-full text-center">Ajustes</p>
+</a>
+</div>
+</div>
+
+</body></html>

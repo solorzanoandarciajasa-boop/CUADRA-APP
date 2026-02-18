@@ -1,0 +1,24 @@
+{
+    "name": "CUADRA",
+    "short_name": "CUADRA",
+    "description": "Gestión inteligente para tu negocio por JASA",
+    "start_url": "index.html",
+    "display": "standalone",
+    "background_color": "#101922",
+    "theme_color": "#e44ea1",
+    "orientation": "portrait",
+    "icons": [
+        {
+            "src": "https://cdn-icons-png.flaticon.com/512/9425/9425832.png",
+            "type": "image/png",
+            "sizes": "192x192",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "https://cdn-icons-png.flaticon.com/512/9425/9425832.png",
+            "type": "image/png",
+            "sizes": "512x512",
+            "purpose": "any maskable"
+        }
+    ]
+}
