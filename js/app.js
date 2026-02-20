@@ -34,6 +34,24 @@ function save() {
     localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify(state));
 }
 
+async function fetchExchangeRate() {
+    if (state.rateMode === 'manual') return;
+    try {
+        // Usando una API confiable para el mercado venezolano (BCV)
+        const response = await fetch('https://ve.dolarapi.com/v1/dolares/oficial');
+        const data = await response.json();
+        if (data && data.promedio) {
+            state.exchangeRate = data.promedio;
+            save();
+            if (state.currentView === 'view-dashboard' || state.currentView === 'view-settings') {
+                render(state.currentView);
+            }
+        }
+    } catch (e) {
+        console.error('Error obteniendo tasa BCV:', e);
+    }
+}
+
 function navigateTo(viewId) {
     // Hidden navigation logic
     document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
@@ -42,7 +60,9 @@ function navigateTo(viewId) {
         target.classList.add('active');
         state.currentView = viewId;
         render(viewId);
-        window.scrollTo(0, 0);
+        // Desplazar al inicio automáticamente al cambiar de vista
+        const app = document.getElementById('app');
+        if (app) app.scrollTop = 0;
     }
 }
 
@@ -280,8 +300,8 @@ function renderAddProduct(el) {
 
                     <div class="text-left"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Tipo de Ítem</label>
                     <div class="flex p-1 bg-slate-100 dark:bg-slate-800 rounded-2xl">
-                        <button onclick="pType='producto'" class="flex-1 py-3 text-[10px] font-black uppercase rounded-xl bg-white dark:bg-slate-700 shadow-sm">Producto</button>
-                        <button onclick="pType='servicio'" class="flex-1 py-3 text-[10px] font-black uppercase text-slate-400">Servicio</button>
+                        <button onclick="pType='producto'; renderAddProduct(document.getElementById('view-add-product'))" class="flex-1 py-3 text-[10px] font-black uppercase rounded-xl ${pType === 'producto' ? 'bg-white dark:bg-slate-700 shadow-sm text-primary' : 'text-slate-400'}">Producto</button>
+                        <button onclick="pType='servicio'; renderAddProduct(document.getElementById('view-add-product'))" class="flex-1 py-3 text-[10px] font-black uppercase rounded-xl ${pType === 'servicio' ? 'bg-white dark:bg-slate-700 shadow-sm text-primary' : 'text-slate-400'}">Servicio</button>
                     </div></div>
                 </div>
 
@@ -540,7 +560,7 @@ function handleAbono(id) {
 
 function shareReceipt(id) {
     const d = state.debts.find(item => item.id === id);
-    const msg = `*RECORDATORIO DE PAGO CUADRA*\n\nHola ${d.customer},\n\nTe recordamos tu cuenta pendiente de *$${d.amount.toFixed(2)}* (Bs ${(d.amount * state.exchangeRate).toLocaleString()}).\n\n📅 Fecha de compromiso: *${d.commitmentDate}*\n\n_Potencia por JASA_ 🚀`;
+    const msg = `*RECORDATORIO DE PAGO - CUADRA*\n\nHola ${d.customer},\n\nTe recordamos tu cuenta pendiente por un monto de *$${d.amount.toFixed(2)}* (Equivalente a Bs ${(d.amount * state.exchangeRate).toLocaleString()}).\n\n📅 Fecha acordada para el pago: *${d.commitmentDate}*.\n\n_Enviado desde CUADRA App_`;
     window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
 }
 
@@ -848,7 +868,13 @@ function clearCart() {
 }
 
 // --- INITIALIZER ---
-window.onload = () => {
+window.onload = async () => {
+    // Intentar obtener tasa actualizada de inmediato
+    await fetchExchangeRate();
+
+    // Auto-actualizar cada 30 minutos
+    setInterval(fetchExchangeRate, 30 * 60 * 1000);
+
     if (!state.isRegistered) {
         navigateTo('view-onboarding');
     } else {

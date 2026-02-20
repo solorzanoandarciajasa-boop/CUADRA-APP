@@ -1,80 +1,67 @@
-/* CUADRA Custom Styles */
+/* CUADRA - Branding & Premium Effects */
 
 :root {
-    --primary: #e44ea1;
-    --secondary: #42fae0;
+    --primary: #ec4899;
+    --secondary: #2dd4bf;
+    --primary-glow: rgba(236, 72, 153, 0.4);
 }
 
-/* Smooth Transitions Between Views */
+@font-face {
+    font-family: 'Plus Jakarta Sans';
+    font-style: normal;
+    font-weight: 400 800;
+    font-display: swap;
+    src: url(https://fonts.gstatic.com/s/plusjakartasans/v8/L0x5DFIqLtdyHGzEK5zU4U_PQHqZkD0.woff2) format('woff2');
+}
+
+/* Base Styles */
+html,
+body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    /* Prevent double scrollbars */
+    background-color: #0f172a;
+    /* Dark background for phone notched areas */
+}
+
+body {
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    -webkit-user-select: none;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+#app {
+    height: 100vh;
+    overflow-y: auto;
+    /* Enable vertical scrolling */
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+}
+
 .view {
-    transition: opacity 0.3s ease-in-out, transform 0.3s ease-out;
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    opacity: 0;
-    pointer-events: none;
-    transform: translateY(10px);
+    display: none;
+    min-height: 100%;
+    animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    background-color: white;
+    /* Default light background */
+}
+
+.dark .view {
+    background-color: #0f172a;
 }
 
 .view.active {
-    opacity: 1;
-    pointer-events: auto;
-    transform: translateY(0);
+    display: block;
 }
 
-/* Scrollbar Styling */
-::-webkit-scrollbar {
-    width: 6px;
-}
-
-::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-    background: rgba(228, 78, 161, 0.2);
-    border-radius: 10px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: rgba(228, 78, 161, 0.4);
-}
-
-/* Material Symbols Outlined Custom Settings */
-.material-symbols-outlined {
-    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-}
-
-/* Pull-to-refresh feel for the containers */
-main {
-    scrollbar-gutter: stable;
-}
-
-/* Micro-animations */
-@keyframes scanline {
-    0% {
-        top: 0;
-    }
-
-    100% {
-        top: 100%;
-    }
-}
-
-.animate-scanline {
-    position: absolute;
-    width: 100%;
-    height: 4px;
-    background: #e44ea1;
-    box-shadow: 0 0 15px #e44ea1;
-    animation: scanline 2s linear infinite;
-}
-
+/* Animations */
 @keyframes fadeIn {
     from {
         opacity: 0;
-        transform: translateY(10px);
+        transform: translateY(8px);
     }
 
     to {
@@ -83,17 +70,72 @@ main {
     }
 }
 
-.animate-fadeIn {
-    animation: fadeIn 0.3s ease-out forwards;
+@keyframes scanline {
+    0% {
+        transform: translateY(0);
+        opacity: 0;
+    }
+
+    10% {
+        opacity: 1;
+    }
+
+    90% {
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateY(288px);
+        opacity: 0;
+    }
 }
 
+.animate-scanline {
+    animation: scanline 2.5s ease-in-out infinite;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 0px;
+    background: transparent;
+}
+
+/* UI Elements */
+.fill-1 {
+    font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 20;
+}
+
+/* FIX: Ensure input text is visible in all modes */
+input,
+select,
+textarea {
+    color: #1e293b !important;
+    /* Forces dark text on light backgrounds */
+    background-color: #f8fafc !important;
+}
+
+.dark input,
+.dark select,
+.dark textarea {
+    color: #ffffff !important;
+    background-color: #1e293b !important;
+}
+
+input:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px var(--primary-glow);
+}
+
+/* Responsive Safe Areas */
 .pb-safe {
-    padding-bottom: env(safe-area-inset-bottom, 20px);
+    padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
 }
 
-/* Custom JASA Gradient Text */
-.text-jasa-gradient {
-    background: linear-gradient(135deg, #e44ea1, #42fae0);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+.pt-safe {
+    padding-top: env(safe-area-inset-top, 0px);
+}
+
+/* Button Active State */
+button:active {
+    transform: scale(0.96);
 }
