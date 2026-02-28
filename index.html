@@ -1,67 +1,51 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="h-full">
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CUADRA - Gestión Inteligente</title>
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>CUADRA by JASA</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#ec4899">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/9425/9425832.png">
 
-    <!-- Google Fonts -->
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Manrope:wght@200..800&display=swap"
-        rel="stylesheet">
 
-    <!-- Material Symbols -->
+    <!-- UI Core -->
     <link rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20,400,0,0" />
-
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             darkMode: 'class',
             theme: {
                 extend: {
                     colors: {
-                        primary: '#ec4899', // Rosa Intenso
-                        'primary-light': '#f472b6',
-                        secondary: '#2dd4bf', // Turquesa
-                        accent: '#42fae0',
-                        'background-light': '#ffffff',
-                        'background-dark': '#0f172a',
-                    },
-                    fontFamily: {
-                        sans: ['Plus Jakarta Sans', 'sans-serif'],
-                        mono: ['Manrope', 'monospace'],
-                    },
+                        primary: '#ec4899',
+                        secondary: '#2dd4bf',
+                    }
                 }
             }
         }
     </script>
-
     <link rel="stylesheet" href="css/style.css">
 </head>
 
-<body class="bg-slate-50 dark:bg-slate-950 font-sans antialiased text-slate-900 overflow-x-hidden">
+<body class="bg-slate-900 text-slate-900 font-sans h-full">
 
-    <!-- App Container -->
-    <div id="app" class="relative min-h-screen max-w-md mx-auto bg-white dark:bg-slate-900 shadow-2xl overflow-hidden">
+    <!-- The App Window -->
+    <div id="app">
 
         <!-- View: Onboarding -->
-        <main id="view-onboarding" class="view active"></main>
+        <main id="view-onboarding" class="view"></main>
 
         <!-- View: Dashboard -->
         <main id="view-dashboard" class="view"></main>
-
-        <!-- View: Add Product -->
-        <main id="view-add-product" class="view"></main>
 
         <!-- View: Inventory -->
         <main id="view-inventory" class="view"></main>
@@ -69,17 +53,8 @@
         <!-- View: Sales -->
         <main id="view-sales" class="view"></main>
 
-        <!-- View: Debts (Fiados) -->
+        <!-- View: Debts -->
         <main id="view-debts" class="view"></main>
-
-        <!-- View: Expenses -->
-        <main id="view-expenses" class="view"></main>
-
-        <!-- View: Reports -->
-        <main id="view-reports" class="view"></main>
-
-        <!-- View: Cash Closure -->
-        <main id="view-closure" class="view"></main>
 
         <!-- View: Settings -->
         <main id="view-settings" class="view"></main>
@@ -89,15 +64,22 @@
 
     </div>
 
-    <!-- Hidden File Inputs for Camera/Gallery -->
-    <input type="file" id="camera-input" accept="image/*" capture="environment" class="hidden">
-    <input type="file" id="gallery-input" accept="image/*" class="hidden">
-
+    <!-- Required Script -->
     <script src="js/app.js"></script>
     <script>
+        // Register SW with cache purging logic
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js').catch(err => console.log(err));
+                navigator.serviceWorker.register('sw.js').then(registration => {
+                    registration.onupdatefound = () => {
+                        const installingWorker = registration.installing;
+                        installingWorker.onstatechange = () => {
+                            if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                location.reload(); // Force update
+                            }
+                        };
+                    };
+                });
             });
         }
     </script>
