@@ -490,14 +490,109 @@ function renderSales(el) {
                         
                         <div class="grid grid-cols-2 gap-4 relative z-10">
                             <button onclick="hProcessSale('normal')" class="bg-primary hover:bg-pink-400 py-5 rounded-[1.5rem] font-black text-white text-xs uppercase tracking-widest shadow-xl shadow-primary/20 active:scale-95 transition-all">COBRAR VENTA</button>
-                            <button onclick="hProcessSale('fiado')" class="bg-white/5 hover:bg-white/10 py-5 rounded-[1.5rem] font-black text-white text-xs uppercase tracking-widest border border-white/10 active:scale-95 transition-all">ES FIADO</button>
+                            <button onclick="hOpenFiadoModal()" class="bg-white/5 hover:bg-white/10 py-5 rounded-[1.5rem] font-black text-white text-xs uppercase tracking-widest border border-white/10 active:scale-95 transition-all">ES FIADO</button>
                         </div>
                     </div>
                 </div>
             </main>
+            
+            <!-- Fiado Modal -->
+            <div id="fiado-modal" class="hidden fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 opacity-0 transition-opacity duration-300">
+                <div class="bg-white dark:bg-slate-900 rounded-[2rem] w-full max-w-sm overflow-hidden shadow-2xl transform scale-95 transition-transform duration-300 relative">
+                    <div class="bg-red-500 p-6 text-white text-center">
+                        <span class="material-symbols-outlined !text-4xl mb-2">menu_book</span>
+                        <h3 class="text-xl font-black uppercase tracking-widest">Nuevo Fiado</h3>
+                    </div>
+                    <div class="p-6 space-y-4">
+                        <div>
+                            <label class="text-xs font-bold uppercase text-slate-500">Nombre del Cliente</label>
+                            <input id="f-name" type="text" placeholder="Ej: Maria Perez" class="w-full mt-1 bg-slate-50 border-none rounded-xl p-3 focus:ring-2 focus:ring-red-500">
+                        </div>
+                        <div>
+                            <label class="text-xs font-bold uppercase text-slate-500">Teléfono (WhatsApp)</label>
+                            <input id="f-phone" type="tel" placeholder="Ej: 04121234567" class="w-full mt-1 bg-slate-50 border-none rounded-xl p-3 focus:ring-2 focus:ring-red-500">
+                        </div>
+                        <div>
+                            <label class="text-xs font-bold uppercase text-slate-500">Fecha de Promesa de Pago</label>
+                            <input id="f-date" type="date" class="w-full mt-1 bg-slate-50 border-none rounded-xl p-3 focus:ring-2 focus:ring-red-500 text-slate-700">
+                        </div>
+                        
+                        <div class="flex gap-2 pt-4">
+                            <button onclick="hCloseFiadoModal()" class="flex-1 py-3 rounded-xl font-bold text-slate-500 bg-slate-100 hover:bg-slate-200 uppercase text-xs">Cancelar</button>
+                            <button onclick="hSubmitFiado()" class="flex-1 py-3 rounded-xl font-black text-white bg-red-500 shadow-lg shadow-red-500/30 uppercase text-xs">Registrar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             ${nav()}
         </div>
     `;
+}
+
+function hOpenFiadoModal() {
+    if (state.cart.length === 0) return alert("El carrito está vacío");
+    const m = document.getElementById('fiado-modal');
+    m.classList.remove('hidden');
+    // Animar entrada
+    setTimeout(() => {
+        m.classList.remove('opacity-0');
+        m.children[0].classList.remove('scale-95');
+    }, 10);
+
+    // Sugerir fecha por defecto (+7 días)
+    const nextWeek = new Date();
+    nextWeek.setDate(nextWeek.getDate() + 7);
+    document.getElementById('f-date').valueAsDate = nextWeek;
+}
+
+function hCloseFiadoModal() {
+    const m = document.getElementById('fiado-modal');
+    m.classList.add('opacity-0');
+    m.children[0].classList.add('scale-95');
+    setTimeout(() => m.classList.add('hidden'), 300);
+}
+
+function hSubmitFiado() {
+    const cName = document.getElementById('f-name').value;
+    const cPhone = document.getElementById('f-phone').value;
+    const cDate = document.getElementById('f-date').value;
+
+    if (!cName || !cPhone || !cDate) return alert("Por favor completa todos los datos para el fiado.");
+
+    hCloseFiadoModal();
+
+    // Process fiado manually
+    const subtotal = state.cart.reduce((a, b) => a + (b.price * b.qty), 0);
+    const profit = state.cart.reduce((a, b) => a + ((b.price - b.cost) * b.qty), 0);
+
+    state.debts.push({
+        id: Date.now().toString(),
+        customer: cName,
+        phone: cPhone,
+        total: subtotal,
+        remaining: subtotal,
+        date: new Date().toLocaleDateString(),
+        commitment: cDate,
+        items: [...state.cart]
+    });
+
+    if (!state.customers.includes(cName)) state.customers.push(cName);
+
+    state.transactions.push({
+        id: Date.now().toString(),
+        type: 'venta',
+        saleType: 'fiado',
+        totalUSD: subtotal,
+        profitUSD: profit,
+        date: new Date().toLocaleDateString(),
+        items: [...state.cart]
+    });
+
+    state.cart = [];
+    saveState();
+    alert("¡Venta a crédito registrada con éxito!");
+    navigateTo('view-dashboard');
 }
 
 function hClearCart() {
@@ -549,26 +644,12 @@ function hUpdateCart(id, change) {
 function hProcessSale(type) {
     if (state.cart.length === 0) return alert("El carrito está vacío");
 
+    if (type === 'fiado') {
+        return hOpenFiadoModal(); // Reemplazado por el nuevo flujo visual
+    }
+
     const subtotal = state.cart.reduce((a, b) => a + (b.price * b.qty), 0);
     const profit = state.cart.reduce((a, b) => a + ((b.price - b.cost) * b.qty), 0);
-
-    if (type === 'fiado') {
-        const cName = prompt("Nombre del Cliente:");
-        if (!cName) return;
-        const cDate = prompt("Fecha de compromiso de pago:", "Próximo Lunes");
-
-        state.debts.push({
-            id: Date.now().toString(),
-            customer: cName,
-            total: subtotal,
-            remaining: subtotal,
-            date: new Date().toLocaleDateString(),
-            commitment: cDate,
-            items: [...state.cart]
-        });
-
-        if (!state.customers.includes(cName)) state.customers.push(cName);
-    }
 
     state.transactions.push({
         id: Date.now().toString(),
@@ -582,7 +663,7 @@ function hProcessSale(type) {
 
     state.cart = [];
     saveState();
-    alert(type === 'fiado' ? "¡Venta a crédito registrada!" : "¡Venta cobrada con éxito!");
+    alert("¡Venta cobrada con éxito!");
     navigateTo('view-dashboard');
 }
 
@@ -606,7 +687,16 @@ async function initAI() {
                     const tensorObj = JSON.parse(dataset);
                     const tensorMap = {};
                     Object.keys(tensorObj).forEach(key => {
-                        tensorMap[key] = tf.tensor(tensorObj[key], [tensorObj[key].length / 1024, 1024]);
+                        const item = tensorObj[key];
+                        // Retrocompatibilidad con la versión anterior que era un array plano
+                        if (Array.isArray(item)) {
+                            // Mobilenet v2 alpha 1.0 tiene embedding de 1024 o 1280, probaremos de inferirlo
+                            const features = item.length % 1280 === 0 ? 1280 : 1024;
+                            tensorMap[key] = tf.tensor2d(item, [item.length / features, features]);
+                        } else {
+                            // Formato nuevo con shape guardado
+                            tensorMap[key] = tf.tensor2d(item.data, item.shape);
+                        }
                     });
                     knnClassifier.setClassifierDataset(tensorMap);
                     console.log("Dataset KNN restaurado.");
@@ -685,8 +775,27 @@ function hPayDebt(id) {
 
 function hShareDebt(id) {
     const d = state.debts.find(item => item.id === id);
-    const msg = `*RECORDATORIO DE PAGO - CUADRA*\nHola ${d.customer}, te recordamos tu saldo de *$${d.remaining.toFixed(2)}* (Bs ${(d.remaining * state.exchangeRate).toLocaleString()}).\n📅 Compromiso: ${d.commitment}.\n_Enviado desde CUADRA App_`;
-    window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
+    let niceDate = d.commitment;
+    try {
+        niceDate = new Date(d.commitment + "T00:00:00").toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' });
+    } catch (e) { }
+
+    const qtyBs = (d.remaining * state.exchangeRate).toLocaleString('es-VE', { minimumFractionDigits: 2 });
+
+    // Mensaje comercial, empático y persuasivo "Técnica de la Presunción Positiva".
+    const msg = `¡Hola ${d.customer}! 👋 Espero estés teniendo un excelente día.
+Paso a saludarte desde *${state.business.name}* y aprovechar para agradecer tu preferencia. ✨
+    
+Te escribía porque estoy organizando mis cuentas de la semana y vi que tenemos agendado tu pago pendiente de $${d.remaining.toFixed(2)} (Bs. ${qtyBs}) para este próximo *${niceDate}*. 
+
+¿Podrías por favor confirmarme la cancelación para ese día? Quedo a tu total disposición y de antemano muchísimas gracias por tu responsabilidad. 🙌`;
+
+    const phoneString = d.phone ? d.phone.replace(/[\s\-\+]/g, '') : '';
+    let waUrl = `https://wa.me/`;
+    if (phoneString) waUrl += `${phoneString}`;
+    waUrl += `?text=${encodeURIComponent(msg)}`;
+
+    window.open(waUrl, '_blank');
 }
 
 function hDeleteDebt(id) {
@@ -776,19 +885,14 @@ function renderScanner(el) {
             
             <!-- Controls Area -->
             <div class="p-8 flex flex-col items-center justify-center min-h-[160px] bg-black text-white relative z-20">
-                ${currentScannerMode === 'inventory' ? `
-                    <p class="text-[10px] font-black uppercase text-slate-500 tracking-widest mb-6">Toma una foto para enseñarle a la IA</p>
-                    <button onclick="hTriggerAiScan()" class="w-20 h-20 rounded-full bg-white flex items-center justify-center shadow-[0_0_30px_rgba(255,255,255,0.3)] active:scale-90 transition-transform disabled:opacity-50" ${isAiLoading ? 'disabled' : ''}>
-                        <div class="w-16 h-16 rounded-full border-4 border-black flex items-center justify-center">
-                            <span class="material-symbols-outlined text-black !text-3xl">psychology</span>
-                        </div>
-                    </button>
-                ` : `
-                    <p class="text-[10px] font-black uppercase text-primary animate-pulse tracking-widest mb-2 flex items-center gap-2">
-                        <span class="material-symbols-outlined !text-sm">psychology</span> Escaneo de IA Activo
-                    </p>
-                    <p class="text-[10px] font-black uppercase text-slate-500 tracking-widest text-center">Apunta al producto y lo reconoceremos solitos</p>
-                `}
+                <p class="text-[10px] font-black uppercase text-slate-500 tracking-widest mb-6">
+                    ${currentScannerMode === 'inventory' ? 'Enseñar producto a la IA' : 'Buscar producto con la IA'}
+                </p>
+                <button onclick="hTriggerAiScan()" class="w-20 h-20 rounded-full bg-white flex items-center justify-center shadow-[0_0_30px_rgba(255,255,255,0.3)] active:scale-90 transition-transform disabled:opacity-50" ${isAiLoading ? 'disabled' : ''}>
+                    <div class="w-16 h-16 rounded-full border-4 border-black flex items-center justify-center">
+                        <span class="material-symbols-outlined text-black !text-3xl">psychology</span>
+                    </div>
+                </button>
             </div>
         </div>
     `;
@@ -823,13 +927,7 @@ function startScanner() {
         (errorMessage) => {
             // ignorar errores continuos de escaneo
         }
-    ).then(() => {
-        // La cámara inició, si es modo Ventas arranca la IA en loop
-        if (currentScannerMode === 'sales' && !isAiLoading && knnClassifier.getNumClasses() > 0) {
-            isAiScanning = true;
-            aiScanLoop();
-        }
-    }).catch((err) => {
+    ).catch((err) => {
         console.error("Error iniciando cámara", err);
     });
 }
@@ -844,37 +942,7 @@ function stopScanner() {
     }
 }
 
-// Lazo de escaneo continuo para IA (Modo Ventas)
-async function aiScanLoop() {
-    if (!isAiScanning) return;
 
-    const videoObj = document.querySelector("#reader video");
-
-    if (videoObj && videoObj.readyState === 4 && aiModel && knnClassifier && knnClassifier.getNumClasses() > 0) {
-        try {
-            const activation = aiModel.infer(videoObj, true);
-            const result = await knnClassifier.predictClass(activation);
-
-            // Si la IA está más de 85% segura
-            if (result.confidences[result.label] > 0.85) {
-                const product = state.inventory.find(p => p.id === result.label);
-                if (product) {
-                    isAiScanning = false;
-                    stopScanner();
-                    hAddToCart(product.id);
-                    alert(`IA Detectó Automáticamente: ${product.name} ✅`);
-                    goBack();
-                    return;
-                }
-            }
-        } catch (e) { }
-    }
-
-    // Repetir ciclo
-    if (isAiScanning) {
-        setTimeout(aiScanLoop, 800);
-    }
-}
 
 // Manejador del QR/Barras
 function handleScanResult(code) {
@@ -904,10 +972,9 @@ function handleScanResult(code) {
     }
 }
 
-// Acción del Botón de Inteligencia Artificial (Solo en Inventario)
+// Acción del Botón de Inteligencia Artificial (El Cerebro Manual)
 async function hTriggerAiScan() {
     if (!aiModel || !knnClassifier) return alert("La IA aún se está cargando. Espera un momento.");
-    if (currentScannerMode !== 'inventory') return;
 
     // El video de la cámara
     const videoObj = document.querySelector("#reader video");
@@ -920,45 +987,70 @@ async function hTriggerAiScan() {
         // Extraer "huella digital" visual del video en vivo
         const activation = aiModel.infer(videoObj, true);
 
-        // Modo "Agregar al Inventario": Entrenamos a la IA para que recuerde esto
+        if (currentScannerMode === 'inventory') {
+            // Modo "Agregar al Inventario": Entrenamos a la IA para que recuerde esto
 
-        // 1. Obtener predicción genérica de MobileNet para sugerir un nombre
-        const predictions = await aiModel.classify(videoObj);
-        let suggestedName = predictions[0].className.split(',')[0];
-        // Traducción básica sugerida (simplificada)
-        const suggestion = `Sugerencia IA: ${suggestedName}`;
-
-        // 2. Pasamos el Tensor a la vista de inventario para guardarlo si el usuario confirma
-        stopScanner();
-        goBack();
-
-        setTimeout(() => {
-            const nameInput = document.getElementById('inv-name');
-            if (nameInput && !nameInput.value) {
-                nameInput.value = suggestedName; // Ponemos el valor real para no perderlo
-            }
-
-            // Extraer imagen para el preview MUY PEQUEÑA para no romper localStorage
+            // Extraer imagen para el preview MUY PEQUEÑA ANTES DE CERRAR LA CAMARA
             const canvas = document.createElement('canvas');
             const maxSize = 200;
-            const aspect = videoObj.videoWidth / videoObj.videoHeight;
+            const aspect = videoObj.videoWidth / videoObj.videoHeight || 1;
             canvas.width = maxSize;
             canvas.height = maxSize / aspect;
 
             canvas.getContext('2d').drawImage(videoObj, 0, 0, canvas.width, canvas.height);
-            tempInventoryImage = canvas.toDataURL('image/jpeg', 0.6);
+            const capturedImage = canvas.toDataURL('image/jpeg', 0.6);
 
-            const preview = document.getElementById('inv-image-preview');
-            if (preview) {
-                preview.innerHTML = `<img src="${tempInventoryImage}" class="w-full h-full object-cover">`;
-                preview.classList.remove('hidden');
+            // 1. Obtener predicción genérica de MobileNet para sugerir un nombre
+            const predictions = await aiModel.classify(videoObj);
+            let suggestedName = predictions[0].className.split(',')[0];
+            const suggestion = `Sugerencia IA: ${suggestedName}`;
+
+            // 2. Pasamos el Tensor a la vista de inventario para guardarlo si el usuario confirma
+            stopScanner(); // <-- AHORA CERRAMOS LA CAMARA (después de capturar el canvas)
+            goBack();
+
+            setTimeout(() => {
+                const nameInput = document.getElementById('inv-name');
+                if (nameInput && !nameInput.value) {
+                    nameInput.value = suggestedName;
+                }
+
+                tempInventoryImage = capturedImage;
+
+                const preview = document.getElementById('inv-image-preview');
+                if (preview) {
+                    preview.innerHTML = `<img src="${tempInventoryImage}" class="w-full h-full object-cover">`;
+                    preview.classList.remove('hidden');
+                }
+
+                window.tempAiActivation = activation;
+
+            }, 500);
+        } else if (currentScannerMode === 'sales') {
+            // Modo Ventas: Buscar coincidencia
+            if (knnClassifier.getNumClasses() === 0) {
+                stopScanner();
+                document.querySelector("#reader").style.opacity = "1";
+                alert("Aún no has registrado ningún producto con la Inteligencia Artificial.");
+                goBack();
+                return;
             }
 
-            // Guardaremos temporalmente la activación (feature map) para asociarla al ID al guardar
-            // Para que no se pierda si hay delay
-            window.tempAiActivation = activation;
+            const result = await knnClassifier.predictClass(activation);
 
-        }, 500); // 500ms para asegurar que el render de Inventory ocurrió
+            if (result.confidences[result.label] > 0.45) { // Si tiene más de 45% certeza
+                const product = state.inventory.find(p => p.id === result.label);
+                stopScanner();
+                if (product) {
+                    hAddToCart(product.id);
+                    alert(`IA Detectó: ${product.name} (Efectividad: ${Math.round(result.confidences[result.label] * 100)}%) ✅`);
+                }
+                goBack();
+            } else {
+                alert("La IA no está segura. Intenta enfocarlo mejor y pulsa de nuevo el cerebro.");
+                document.querySelector("#reader").style.opacity = "1";
+            }
+        }
 
     } catch (e) {
         console.error("Error en AI Scan:", e);
@@ -974,8 +1066,11 @@ function persistKnn() {
         let dataset = knnClassifier.getClassifierDataset();
         let datasetObj = {};
         Object.keys(dataset).forEach((key) => {
-            let data = dataset[key].dataSync();
-            datasetObj[key] = Array.from(data);
+            let tensor = dataset[key];
+            datasetObj[key] = {
+                data: Array.from(tensor.dataSync()),
+                shape: tensor.shape
+            };
         });
         localStorage.setItem('knn_dataset', JSON.stringify(datasetObj));
     } catch (e) { console.error("Could not persist KNN", e) }
