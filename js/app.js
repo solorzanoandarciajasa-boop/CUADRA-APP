@@ -25,6 +25,15 @@ let state = JSON.parse(localStorage.getItem(APP_STORAGE)) || {
     currentView: 'view-onboarding'
 };
 
+// --- AI & SCANNER STATE ---
+let aiModel = null;
+let knnClassifier = null;
+let html5QrcodeScanner = null;
+let currentScannerMode = 'sales'; // 'sales' or 'inventory'
+let isAiLoading = true;
+let isAiScanning = false;
+let aiScanInterval = null;
+
 // --- CORE UTILS ---
 function saveState() {
     localStorage.setItem(APP_STORAGE, JSON.stringify(state));
@@ -287,12 +296,17 @@ function renderInventory(el) {
                 <div class="card-glass space-y-4">
                     <div class="flex items-center justify-between">
                         <h3 class="text-sm font-black uppercase tracking-widest text-primary">Nuevo Producto</h3>
-                        <label for="inv-image-input" class="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center cursor-pointer text-slate-400">
-                            <span class="material-symbols-outlined">add_a_photo</span>
-                            <input id="inv-image-input" type="file" accept="image/*" class="hidden" onchange="hHandleInventoryImage(this)">
-                        </label>
+                        <div class="flex gap-2">
+                             <button onclick="hOpenScanner('inventory')" class="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center cursor-pointer text-primary">
+                                 <span class="material-symbols-outlined">psychology</span>
+                             </button>
+                             <label for="inv-image-input" class="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center cursor-pointer text-slate-400 hover:text-primary transition-colors">
+                                 <span class="material-symbols-outlined">add_a_photo</span>
+                                 <input id="inv-image-input" type="file" accept="image/*" class="hidden" onchange="hHandleInventoryImage(this)">
+                             </label>
+                        </div>
                     </div>
-                    <div id="inv-image-preview" class="hidden w-20 h-20 rounded-2xl bg-slate-100 overflow-hidden mx-auto border-2 border-primary/20"></div>
+                    <div id="inv-image-preview" class="hidden w-24 h-24 rounded-[1.5rem] bg-slate-50 overflow-hidden mx-auto border-[3px] border-primary/20 shadow-inner"></div>
                     
                     <div class="space-y-3">
                         <div><label>Nombre del Producto</label><input id="inv-name" type="text" placeholder="Ej: Polar 330ml"></div>
@@ -359,7 +373,17 @@ function hAddProduct() {
 
     if (!name || isNaN(cost) || isNaN(price)) return alert("Completa nombre, costo y precio");
 
-    state.inventory.push({ id: Date.now().toString(), name, cost, price, desc, code, image });
+    const newId = Date.now().toString();
+    state.inventory.push({ id: newId, name, cost, price, desc, code, image });
+
+    // ¿Hubo una activación de IA en progreso? (Foto recién tomada por AI Scanner)
+    if (window.tempAiActivation && knnClassifier) {
+        // Enseñar al KNNClassifier que esta activación es de este producto (newId)
+        knnClassifier.addExample(window.tempAiActivation, newId);
+        window.tempAiActivation.dispose(); // Limpiar memoria de WebGL
+        window.tempAiActivation = null;
+    }
+
     tempInventoryImage = null;
     saveState();
     renderInventory(document.getElementById('view-inventory'));
@@ -388,10 +412,11 @@ function renderSales(el) {
                         <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-300">search</span>
                         <div id="search-results" class="absolute top-full left-0 w-full bg-white dark:bg-slate-800 border dark:border-slate-700 rounded-3xl shadow-2xl z-40 hidden mt-2"></div>
                     </div>
-                    <button onclick="navigateTo('view-scanner')" class="bg-gradient-to-br from-primary to-pink-600 text-white w-16 h-16 rounded-[1.5rem] flex items-center justify-center shadow-xl shadow-primary/30 active:scale-95 transition-all">
+                    <button onclick="hOpenScanner('sales')" class="bg-gradient-to-br from-primary to-pink-600 text-white w-16 h-16 rounded-[1.5rem] flex items-center justify-center shadow-xl shadow-primary/30 active:scale-95 transition-all">
                         <span class="material-symbols-outlined !text-4xl">qr_code_scanner</span>
                     </button>
                 </div>
+
 
                 <!-- Cart Items -->
                 <div class="space-y-4">
@@ -521,7 +546,6 @@ function hProcessSale(type) {
             items: [...state.cart]
         });
 
-        // Add to customers list if new
         if (!state.customers.includes(cName)) state.customers.push(cName);
     }
 
@@ -539,6 +563,37 @@ function hProcessSale(type) {
     saveState();
     alert(type === 'fiado' ? "¡Venta a crédito registrada!" : "¡Venta cobrada con éxito!");
     navigateTo('view-dashboard');
+}
+
+// --- SCANNER & AI LOGIC ---
+
+async function initAI() {
+    try {
+        if (!aiModel) {
+            console.log("Cargando MobileNet...");
+            aiModel = await mobilenet.load({ version: 2, alpha: 1.0 });
+            console.log("MobileNet cargado.");
+        }
+        if (!knnClassifier) {
+            console.log("Inicializando KNN Classifier...");
+            knnClassifier = knnClassifier || window.knnClassifier.create();
+            console.log("KNN listo.");
+            // Si tuviéramos base de datos de KNN (embeddings), la cargaríamos aquí
+        }
+        isAiLoading = false;
+
+        // Si el escáner está abierto, actualizamos la vista para quitar el loader
+        if (state.currentView === 'view-scanner') {
+            renderScanner(document.getElementById('view-scanner'));
+        }
+    } catch (e) {
+        console.error("Error al cargar IA:", e);
+        isAiLoading = false;
+        if (state.currentView === 'view-scanner') {
+            renderScanner(document.getElementById('view-scanner'));
+        }
+        alert("Aviso: El motor de IA Visual podría no estar disponible offline en este momento.");
+    }
 }
 
 function renderDebts(el) {
@@ -649,72 +704,270 @@ function hResetApp() {
 
 function renderScanner(el) {
     el.innerHTML = `
-        <div class="bg-black min-h-screen flex flex-col items-center justify-center relative">
-            <!-- Back Button -->
-            <button onclick="goBack()" class="absolute left-6 top-14 z-50 text-white/50 hover:text-white">
-                <span class="material-symbols-outlined !text-4xl">arrow_back</span>
-            </button>
+        <div class="bg-black min-h-screen flex flex-col relative z-50">
+            <!-- Header -->
+            <div class="flex items-center justify-between p-6 pt-12 absolute top-0 w-full z-20">
+                <button onclick="hCloseScanner()" class="w-10 h-10 rounded-full bg-black/50 backdrop-blur flex items-center justify-center text-white">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+                <div class="bg-primary px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest text-white shadow-lg">
+                    Modo: ${currentScannerMode === 'sales' ? 'Ventas' : 'Inventario'}
+                </div>
+            </div>
 
-            <div id="video-container" class="absolute inset-0 bg-slate-900 flex items-center justify-center">
-                <span class="material-symbols-outlined !text-9xl text-white/10 animate-pulse">videocam</span>
-                <!-- Background Mock for now, logic below attempts real scan -->
+            <!-- Scanner Feed Area -->
+            <div class="flex-1 relative bg-slate-900 rounded-b-[3rem] overflow-hidden shadow-2xl">
+                <!-- QR/Barcode Reader Container -->
+                <div id="reader" class="w-full h-full object-cover"></div>
+                
+                <!-- UI Overlay for scanning -->
+                <div class="absolute inset-0 pointer-events-none border-[6px] border-primary/20 m-6 rounded-[2rem] z-10 flex items-center justify-center">
+                    <div class="w-64 h-64 border-2 border-primary rounded-3xl relative">
+                        <div class="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-white rounded-tl-xl -translate-x-1 -translate-y-1"></div>
+                        <div class="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-white rounded-tr-xl translate-x-1 -translate-y-1"></div>
+                        <div class="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-white rounded-bl-xl -translate-x-1 translate-y-1"></div>
+                        <div class="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-white rounded-br-xl translate-x-1 translate-y-1"></div>
+                        <div class="scan-line absolute left-0 w-full h-1 bg-primary shadow-[0_0_15px_#ec4899] animate-[scan_3s_infinite_ease-in-out]"></div>
+                    </div>
+                </div>
+
+                ${isAiLoading ? `
+                <div class="absolute inset-0 bg-black/80 z-20 flex flex-col items-center justify-center text-white">
+                    <span class="material-symbols-outlined animate-spin text-4xl mb-4 text-primary">autorenew</span>
+                    <p class="font-black text-xs uppercase tracking-widest">Iniciando Motor IA...</p>
+                </div>
+                ` : ''}
             </div>
             
-            <div class="relative z-10 w-full flex flex-col items-center">
-                <div class="w-64 h-64 border-2 border-primary rounded-[3rem] relative overflow-hidden mb-10 shadow-[0_0_50px_rgba(236,72,153,0.3)]">
-                    <div class="scan-line"></div>
-                </div>
-                <h3 class="text-white font-black text-2xl uppercase tracking-tighter">Smart Scan</h3>
-                <p class="text-white/40 text-[10px] font-black uppercase tracking-widest mt-2">Enfoque el producto o código</p>
-                
-                <div class="mt-12 flex flex-col gap-4 w-60">
-                    <!-- Photo Mode -->
-                    <button onclick="hTriggerPhotoScan()" class="btn-primary flex items-center justify-center gap-2 px-8 py-4">
-                        <span class="material-symbols-outlined">photo_camera</span> Scan por Foto
+            <!-- Controls Area -->
+            <div class="p-8 flex flex-col items-center justify-center min-h-[160px] bg-black text-white relative z-20">
+                ${currentScannerMode === 'inventory' ? `
+                    <p class="text-[10px] font-black uppercase text-slate-500 tracking-widest mb-6">Toma una foto para enseñarle a la IA</p>
+                    <button onclick="hTriggerAiScan()" class="w-20 h-20 rounded-full bg-white flex items-center justify-center shadow-[0_0_30px_rgba(255,255,255,0.3)] active:scale-90 transition-transform disabled:opacity-50" ${isAiLoading ? 'disabled' : ''}>
+                        <div class="w-16 h-16 rounded-full border-4 border-black flex items-center justify-center">
+                            <span class="material-symbols-outlined text-black !text-3xl">psychology</span>
+                        </div>
                     </button>
-                </div>
+                ` : `
+                    <p class="text-[10px] font-black uppercase text-primary animate-pulse tracking-widest mb-2 flex items-center gap-2">
+                        <span class="material-symbols-outlined !text-sm">psychology</span> Escaneo de IA Activo
+                    </p>
+                    <p class="text-[10px] font-black uppercase text-slate-500 tracking-widest text-center">Apunta al producto y lo reconoceremos solitos</p>
+                `}
             </div>
         </div>
     `;
+
+    // Start scanner after render
+    setTimeout(startScanner, 100);
 }
 
-// SIMULACIÓN DE RECONOCIMIENTO POR FOTO (Petición del usuario)
-function hTriggerPhotoScan() {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*';
-    input.capture = 'environment';
+function hOpenScanner(mode) {
+    currentScannerMode = mode;
+    navigateTo('view-scanner');
+}
 
-    input.onchange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            // "Analizando..." feedback
-            alert("JASA AI Analizando producto...");
+function hCloseScanner() {
+    stopScanner();
+    goBack();
+}
 
-            // Simulación inteligente: Selecciona un producto random del inventario si existe
-            if (state.inventory.length === 0) return alert("Primero registra productos en tu Stock para poder reconocerlos.");
+// Inicializar lector y lógica de captura
+function startScanner() {
+    if (html5QrcodeScanner) return;
 
-            setTimeout(() => {
-                const match = state.inventory[Math.floor(Math.random() * state.inventory.length)];
-                if (confirm(`Producto Detectado:\n${match.name}\nPrecio: $${match.price.toFixed(2)}\n\n¿Añadir al carrito?`)) {
-                    hAddToCart(match.id);
-                    navigateTo('view-sales');
-                }
-            }, 1000);
+    html5QrcodeScanner = new Html5Qrcode("reader");
+
+    html5QrcodeScanner.start(
+        { facingMode: "environment" },
+        { fps: 10, qrbox: { width: 250, height: 250 } },
+        (decodedText, decodedResult) => {
+            // QR detectado
+            handleScanResult(decodedText);
+        },
+        (errorMessage) => {
+            // ignorar errores continuos de escaneo
         }
-    };
-    input.click();
+    ).then(() => {
+        // La cámara inició, si es modo Ventas arranca la IA en loop
+        if (currentScannerMode === 'sales' && !isAiLoading && knnClassifier.getNumClasses() > 0) {
+            isAiScanning = true;
+            aiScanLoop();
+        }
+    }).catch((err) => {
+        console.error("Error iniciando cámara", err);
+    });
+}
+
+function stopScanner() {
+    isAiScanning = false;
+    if (html5QrcodeScanner) {
+        html5QrcodeScanner.stop().then(() => {
+            html5QrcodeScanner.clear();
+            html5QrcodeScanner = null;
+        }).catch(err => console.error("Fallo al detener cámara", err));
+    }
+}
+
+// Lazo de escaneo continuo para IA (Modo Ventas)
+async function aiScanLoop() {
+    if (!isAiScanning) return;
+
+    const videoObj = document.querySelector("#reader video");
+
+    if (videoObj && videoObj.readyState === 4 && aiModel && knnClassifier && knnClassifier.getNumClasses() > 0) {
+        try {
+            const activation = aiModel.infer(videoObj, true);
+            const result = await knnClassifier.predictClass(activation);
+
+            // Si la IA está más de 85% segura
+            if (result.confidences[result.label] > 0.85) {
+                const product = state.inventory.find(p => p.id === result.label);
+                if (product) {
+                    isAiScanning = false;
+                    stopScanner();
+                    hAddToCart(product.id);
+                    alert(`IA Detectó Automáticamente: ${product.name} ✅`);
+                    goBack();
+                    return;
+                }
+            }
+        } catch (e) { }
+    }
+
+    // Repetir ciclo
+    if (isAiScanning) {
+        setTimeout(aiScanLoop, 800);
+    }
+}
+
+// Manejador del QR/Barras
+function handleScanResult(code) {
+    // Evitar múltiples lecturas
+    stopScanner();
+
+    if (currentScannerMode === 'sales') {
+        const product = state.inventory.find(p => p.code === code);
+        if (product) {
+            hAddToCart(product.id);
+            alert(`Escaneado: ${product.name} ✅`);
+            goBack();
+        } else {
+            alert(`El código ${code} no está en el inventario.`);
+            goBack();
+        }
+    } else if (currentScannerMode === 'inventory') {
+        goBack();
+        // Esperamos que la vista cambie y luego rellenamos
+        setTimeout(() => {
+            const codeInput = document.getElementById('inv-code');
+            if (codeInput) {
+                codeInput.value = code;
+                codeInput.classList.add('animate-pop-in');
+            }
+        }, 300);
+    }
+}
+
+// Acción del Botón de Inteligencia Artificial (Solo en Inventario)
+async function hTriggerAiScan() {
+    if (!aiModel || !knnClassifier) return alert("La IA aún se está cargando. Espera un momento.");
+    if (currentScannerMode !== 'inventory') return;
+
+    // El video de la cámara
+    const videoObj = document.querySelector("#reader video");
+    if (!videoObj) return alert("Cámara no disponible.");
+
+    try {
+        // Pausar UI (Feedback visual)
+        document.querySelector("#reader").style.opacity = "0.5";
+
+        // Extraer "huella digital" visual del video en vivo
+        const activation = aiModel.infer(videoObj, true);
+
+        // Modo "Agregar al Inventario": Entrenamos a la IA para que recuerde esto
+
+        // 1. Obtener predicción genérica de MobileNet para sugerir un nombre
+        const predictions = await aiModel.classify(videoObj);
+        let suggestedName = predictions[0].className.split(',')[0];
+        // Traducción básica sugerida (simplificada)
+        const suggestion = `Sugerencia IA: ${suggestedName}`;
+
+        // 2. Pasamos el Tensor a la vista de inventario para guardarlo si el usuario confirma
+        stopScanner();
+        goBack();
+
+        setTimeout(() => {
+            const nameInput = document.getElementById('inv-name');
+            if (nameInput && !nameInput.value) {
+                nameInput.placeholder = suggestion;
+            }
+
+            // Extraer imagen para el preview
+            const canvas = document.createElement('canvas');
+            canvas.width = videoObj.videoWidth;
+            canvas.height = videoObj.videoHeight;
+            canvas.getContext('2d').drawImage(videoObj, 0, 0);
+            tempInventoryImage = canvas.toDataURL('image/jpeg');
+
+            const preview = document.getElementById('inv-image-preview');
+            if (preview) {
+                preview.innerHTML = `<img src="${tempInventoryImage}" class="w-full h-full object-cover">`;
+                preview.classList.remove('hidden');
+            }
+
+            // Guardaremos temporalmente la activación (feature map) para asociarla al ID al guardar
+            window.tempAiActivation = activation;
+
+        }, 300);
+
+    } catch (e) {
+        console.error("Error en AI Scan:", e);
+        alert("Ocurrió un error al procesar la imagen con IA.");
+        document.querySelector("#reader").style.opacity = "1";
+    }
+}
+
+// Al añadir un producto en Inventario, guardamos la imagen y entrenamos KNN
+function hAddProduct() {
+    const name = document.getElementById('inv-name').value;
+    const cost = parseFloat(document.getElementById('inv-cost').value);
+    const price = parseFloat(document.getElementById('inv-price').value);
+    const desc = document.getElementById('inv-desc').value;
+    const code = document.getElementById('inv-code').value;
+    const image = tempInventoryImage;
+
+    if (!name || isNaN(cost) || isNaN(price)) return alert("Completa nombre, costo y precio");
+
+    const newId = Date.now().toString();
+    state.inventory.push({ id: newId, name, cost, price, desc, code, image });
+
+    // ¿Hubo una activación de IA en progreso? (Foto recién tomada por AI Scanner)
+    if (window.tempAiActivation && knnClassifier) {
+        // Enseñar al KNNClassifier que esta activación es de este producto (newId)
+        knnClassifier.addExample(window.tempAiActivation, newId);
+        window.tempAiActivation.dispose(); // Limpiar memoria de WebGL
+        window.tempAiActivation = null;
+    }
+
+    tempInventoryImage = null;
+    saveState();
+    renderInventory(document.getElementById('view-inventory'));
 }
 
 // --- INITIALIZER ---
 window.onload = async () => {
-    // 1. Tasa BCV on startup
+    // 1. Start AI Load in background
+    initAI();
+
+    // 2. Tasa BCV on startup
     await updateExchangeRate();
 
-    // 2. Start View
+    // 3. Start View
     if (!state.isRegistered) {
         navigateTo('view-onboarding');
     } else {
         navigateTo(state.currentView || 'view-dashboard');
     }
 };
+
