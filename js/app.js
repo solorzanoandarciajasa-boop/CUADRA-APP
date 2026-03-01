@@ -92,13 +92,15 @@ function renderView(viewId) {
     const container = document.getElementById(viewId);
     if (!container) return;
 
-    // Protection: If not registered, force onboarding
-    if (!state.isRegistered && viewId !== 'view-onboarding') {
+    // Protection: If not registered, force onboarding (unless auth screens)
+    if (!state.isRegistered && viewId !== 'view-onboarding' && viewId !== 'view-setup-auth' && viewId !== 'view-auth') {
         navigateTo('view-onboarding');
         return;
     }
 
     switch (viewId) {
+        case 'view-setup-auth': renderSetupAuth(container); break;
+        case 'view-auth': renderAuth(container); break;
         case 'view-onboarding': renderOnboarding(container); break;
         case 'view-dashboard': renderDashboard(container); break;
         case 'view-inventory': renderInventory(container); break;
@@ -106,6 +108,7 @@ function renderView(viewId) {
         case 'view-debts': renderDebts(container); break;
         case 'view-settings': renderSettings(container); break;
         case 'view-scanner': renderScanner(container); break;
+        case 'view-customers': renderCustomers(container); break;
     }
 }
 
@@ -123,9 +126,9 @@ function header(title, subtitle = "", showBack = true) {
                     <h1 class="text-3xl font-black text-slate-900 dark:text-white leading-none tracking-tight">CUADRA</h1>
                     <p class="text-[10px] font-black text-primary uppercase tracking-[0.3em] mt-1">por jasa</p>
                 </div>
-                <div class="h-10 w-10 bg-primary/10 rounded-full flex items-center justify-center border border-primary/20 text-primary">
-                    <span class="material-symbols-outlined">person</span>
-                </div>
+                <button onclick="navigateTo('view-settings')" class="h-10 w-10 bg-primary/10 rounded-full flex items-center justify-center border border-primary/20 text-primary active:scale-95 transition-transform cursor-pointer">
+                    <span class="material-symbols-outlined">settings</span>
+                </button>
             </div>
             <div class="${showBack ? 'ml-8' : ''}">
                 ${title ? `<h2 class="text-xl font-bold text-slate-800 dark:text-slate-100 mt-4">${title}</h2>` : ''}
@@ -158,11 +161,130 @@ function nav() {
                 <span class="material-symbols-outlined">calendar_month</span>
                 <span class="text-[8px] font-bold uppercase">Fiados</span>
             </button>
+            <button onclick="navigateTo('view-customers')" class="nav-item ${v === 'view-customers' ? 'active' : ''}">
+                <span class="material-symbols-outlined">groups</span>
+                <span class="text-[8px] font-bold uppercase">Clientes</span>
+            </button>
         </nav>
     `;
 }
 
 // --- VIEWS IMPLEMENTATION ---
+
+function renderSetupAuth(el) {
+    el.innerHTML = `
+        <div class="p-8 min-h-screen flex flex-col justify-center bg-gradient-to-br from-white to-pink-50 dark:from-slate-900 dark:to-slate-950">
+            <div class="mb-12">
+                <h1 class="text-5xl font-black text-slate-900 dark:text-white tracking-tighter">CUADRA</h1>
+                <p class="text-primary font-black uppercase tracking-[0.4em] text-xs">Modo Seguridad</p>
+            </div>
+            
+            <div class="space-y-6">
+                <div>
+                    <h2 class="text-2xl font-black mb-2">Seguridad Biométrica</h2>
+                    <p class="text-slate-500 text-sm">Protege tu negocio usando tu huella dactilar o FaceID.</p>
+                </div>
+                
+                <div class="space-y-4">
+                    <button onclick="hRegisterAuth('Cliente')" class="w-full btn-primary py-4 rounded-2xl flex items-center justify-center gap-2">
+                        <span class="material-symbols-outlined">fingerprint</span> Registrar Huella Propietario
+                    </button>
+                    <button onclick="hRegisterAuth('Desarrollador')" class="w-full bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 py-4 rounded-2xl font-bold uppercase tracking-widest text-xs flex items-center justify-center gap-2">
+                        <span class="material-symbols-outlined">code</span> Soy el Desarrollador (JASA)
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+async function hRegisterAuth(role) {
+    if (!window.PublicKeyCredential) {
+        alert("Tu navegador no soporta lector de huellas web. Se omitirá este paso.");
+        localStorage.setItem('cuadra_auth_cred', 'disabled');
+        return hFinishAuth();
+    }
+
+    try {
+        const challenge = new Uint8Array(32);
+        crypto.getRandomValues(challenge);
+
+        await navigator.credentials.create({
+            publicKey: {
+                challenge: challenge,
+                rp: { name: "CUADRA App" },
+                user: {
+                    id: Uint8Array.from(role, c => c.charCodeAt(0)),
+                    name: role,
+                    displayName: role
+                },
+                pubKeyCredParams: [{ alg: -7, type: "public-key" }, { alg: -257, type: "public-key" }],
+                authenticatorSelection: { userVerification: "required" },
+                timeout: 60000
+            }
+        });
+
+        localStorage.setItem('cuadra_auth_cred', 'registered');
+        localStorage.setItem('cuadra_auth_role', role);
+        alert(role === 'Desarrollador' ? "Master/Dev access biométrico configurado." : "Huella registrada asegurando tu información.");
+        hFinishAuth();
+    } catch (e) {
+        console.error(e);
+        localStorage.setItem('cuadra_auth_cred', 'disabled');
+        alert("Autenticación biométrica no soportada o cancelada. Acceso estándar activado.");
+        hFinishAuth();
+    }
+}
+
+function renderAuth(el) {
+    const role = localStorage.getItem('cuadra_auth_role') || 'Usuario';
+
+    el.innerHTML = `
+        <div class="p-8 min-h-screen flex flex-col justify-center items-center bg-black text-white text-center">
+             <div class="mb-12">
+                 <span class="material-symbols-outlined !text-6xl text-primary mb-4 block">lock</span>
+                 <h2 class="text-2xl font-black mb-2">Bloqueo Activo</h2>
+                 <p class="text-slate-400 text-sm">Acceso biométrico requerido para<br><span class="text-primary font-bold uppercase tracking-widest mt-1 inline-block">${role}</span></p>
+             </div>
+             
+             <button onclick="hVerifyAuth()" class="w-full btn-primary py-4 rounded-2xl flex items-center justify-center gap-2 max-w-sm">
+                 <span class="material-symbols-outlined">fingerprint</span> Toca para Desbloquear
+             </button>
+        </div>
+    `;
+
+    setTimeout(hVerifyAuth, 500);
+}
+
+async function hVerifyAuth() {
+    if (localStorage.getItem('cuadra_auth_cred') === 'disabled') {
+        return hFinishAuth();
+    }
+
+    try {
+        const challenge = new Uint8Array(32);
+        crypto.getRandomValues(challenge);
+
+        await navigator.credentials.get({
+            publicKey: {
+                challenge: challenge,
+                userVerification: "required"
+            }
+        });
+
+        hFinishAuth();
+    } catch (e) {
+        console.error(e);
+    }
+}
+
+function hFinishAuth() {
+    if (!state.isRegistered) {
+        navigateTo('view-onboarding');
+    } else {
+        navigateTo('view-dashboard');
+    }
+}
 
 function renderOnboarding(el) {
     el.innerHTML = `
@@ -393,16 +515,18 @@ function hAddProduct() {
     state.inventory.push({ id: newId, name, cost, price, desc, code, image });
 
     // ¿Hubo una activación de IA en progreso? (Foto recién tomada por AI Scanner)
-    if (window.tempAiActivation && knnClassifier) {
+    if (window.tempAiActivations && knnClassifier) {
         // Enseñar al KNNClassifier que esta activación es de este producto (newId)
         try {
-            knnClassifier.addExample(window.tempAiActivation, newId);
+            window.tempAiActivations.forEach(act => {
+                knnClassifier.addExample(act, newId);
+                act.dispose(); // Limpiar memoria de WebGL
+            });
             persistKnn(); // Guardar aprendizaje matemático
         } catch (e) {
             console.error(e);
         }
-        window.tempAiActivation.dispose(); // Limpiar memoria de WebGL
-        window.tempAiActivation = null;
+        window.tempAiActivations = null;
     }
 
     tempInventoryImage = null;
@@ -504,9 +628,26 @@ function renderSales(el) {
                         <h3 class="text-xl font-black uppercase tracking-widest">Nuevo Fiado</h3>
                     </div>
                     <div class="p-6 space-y-4">
-                        <div>
-                            <label class="text-xs font-bold uppercase text-slate-500">Nombre del Cliente</label>
-                            <input id="f-name" type="text" placeholder="Ej: Maria Perez" class="w-full mt-1 bg-slate-50 border-none rounded-xl p-3 focus:ring-2 focus:ring-red-500">
+                        <div class="relative">
+                            <div class="flex items-center justify-between mb-1">
+                                <label class="text-xs font-bold uppercase text-slate-500">Nombre del Cliente</label>
+                                <button onclick="document.getElementById('f-customer-list').classList.toggle('hidden')" class="text-xs font-black text-primary bg-primary/10 px-2 py-1 rounded flex items-center gap-1 active:scale-95 transition-transform">
+                                    <span class="material-symbols-outlined !text-sm">import_contacts</span> Buscar
+                                </button>
+                            </div>
+                            <input id="f-name" type="text" placeholder="Ej: Maria Perez" class="w-full bg-slate-50 border-none rounded-xl p-3 focus:ring-2 focus:ring-red-500">
+                            
+                            <!-- Dropdown Clientes Existentes -->
+                            <div id="f-customer-list" class="hidden absolute top-full left-0 w-full mt-2 bg-white dark:bg-slate-800 border dark:border-slate-700 rounded-xl shadow-2xl z-50 max-h-40 overflow-y-auto">
+                                ${state.customers.length === 0 ? '<p class="p-4 text-xs text-center text-slate-400 font-bold uppercase">No hay clientes</p>' :
+            state.customers.map(c => `
+                                        <button onclick="hAutoFillCustomer('${c.name}', '${c.phone}')" class="w-full text-left p-3 hover:bg-slate-50 dark:hover:bg-slate-700 border-b last:border-b-0 flex flex-col transition-colors">
+                                            <span class="font-bold text-sm text-slate-800 dark:text-white">${c.name}</span>
+                                            <span class="text-[10px] text-slate-400 font-bold">${c.phone || 'Sin número'}</span>
+                                        </button>
+                                    `).join('')
+        }
+                            </div>
                         </div>
                         <div>
                             <label class="text-xs font-bold uppercase text-slate-500">Teléfono (WhatsApp)</label>
@@ -546,6 +687,12 @@ function hOpenFiadoModal() {
     document.getElementById('f-date').valueAsDate = nextWeek;
 }
 
+function hAutoFillCustomer(name, phone) {
+    document.getElementById('f-name').value = name;
+    document.getElementById('f-phone').value = phone || '';
+    document.getElementById('f-customer-list').classList.add('hidden');
+}
+
 function hCloseFiadoModal() {
     const m = document.getElementById('fiado-modal');
     m.classList.add('opacity-0');
@@ -576,9 +723,14 @@ function hSubmitFiado() {
         commitment: cDate,
         items: [...state.cart]
     });
-
-    if (!state.customers.includes(cName)) state.customers.push(cName);
-
+    if (!state.customers.find(c => c.name === cName || c === cName)) {
+        state.customers.push({
+            id: Date.now().toString(),
+            name: cName,
+            phone: cPhone,
+            since: new Date().toLocaleDateString()
+        });
+    }
     state.transactions.push({
         id: Date.now().toString(),
         type: 'venta',
@@ -790,7 +942,22 @@ Te escribía porque estoy organizando mis cuentas de la semana y vi que tenemos 
 
 ¿Podrías por favor confirmarme la cancelación para ese día? Quedo a tu total disposición y de antemano muchísimas gracias por tu responsabilidad. 🙌`;
 
-    const phoneString = d.phone ? d.phone.replace(/[\s\-\+]/g, '') : '';
+    // Validar y formatear número de teléfono (País Venezuela +58 por defecto, o el indicado manual)
+    let phoneString = d.phone ? d.phone.replace(/[\s\-]/g, '') : '';
+    if (phoneString) {
+        if (!phoneString.startsWith('+')) {
+            // Si empieza en 0 (Ej: 0412), lo quitamos y agregamos 58
+            if (phoneString.startsWith('0')) {
+                phoneString = '58' + phoneString.substring(1);
+            } else {
+                phoneString = '58' + phoneString;
+            }
+        } else {
+            // Quitar el '+' para la url de whatsapp
+            phoneString = phoneString.substring(1);
+        }
+    }
+
     let waUrl = `https://wa.me/`;
     if (phoneString) waUrl += `${phoneString}`;
     waUrl += `?text=${encodeURIComponent(msg)}`;
@@ -803,6 +970,140 @@ function hDeleteDebt(id) {
     state.debts = state.debts.filter(d => d.id !== id);
     saveState();
     renderDebts(document.getElementById('view-debts'));
+}
+
+function renderCustomers(el) {
+    // Migrar clientes antiguos si son solo strings (version antigua)
+    if (state.customers.length > 0 && typeof state.customers[0] === 'string') {
+        state.customers = state.customers.map((c, i) => ({
+            id: Date.now().toString() + i,
+            name: c,
+            phone: '',
+            since: 'Ayer'
+        }));
+        saveState();
+    }
+
+    el.innerHTML = `
+        <div class="pb-nav min-h-screen">
+            ${header("Clientes", "Tu base de datos")}
+            
+            <main class="p-6 space-y-6">
+                <!-- Estadísticas de Clientes -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="card-glass text-center !p-4 border-t-4 border-t-primary">
+                        <span class="material-symbols-outlined text-primary mb-2">groups</span>
+                        <h4 class="text-2xl font-black">${state.customers.length}</h4>
+                        <p class="text-[9px] font-black uppercase text-slate-500 tracking-widest mt-1">Total</p>
+                    </div>
+                    <div class="card-glass text-center !p-4 border-t-4 border-t-emerald-400">
+                        <span class="material-symbols-outlined text-emerald-400 mb-2">verified</span>
+                        <h4 class="text-2xl font-black">${state.customers.length > 0 ? '100%' : '0%'}</h4>
+                        <p class="text-[9px] font-black uppercase text-slate-500 tracking-widest mt-1">Activos</p>
+                    </div>
+                </div>
+
+                <!-- Lista de Clientes -->
+                <div class="space-y-4">
+                    ${state.customers.length === 0 ? '<p class="text-center opacity-20 py-20 uppercase font-black text-xs">No hay clientes aún</p>' :
+            state.customers.map(c => {
+                const activeDebts = state.debts.filter(d => d.customer === c.name);
+                const totalDebt = activeDebts.reduce((a, b) => a + b.remaining, 0);
+
+                return `
+                        <div class="card-glass">
+                            <div class="flex items-center justify-between mb-3">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-primary font-black uppercase shadow-inner">
+                                        ${c.name.substring(0, 2)}
+                                    </div>
+                                    <div>
+                                        <h4 class="font-black text-slate-900 dark:text-white capitalize">${c.name}</h4>
+                                        <p class="text-[10px] font-bold text-slate-400">Telf: ${c.phone || 'No registrado'}</p>
+                                    </div>
+                                </div>
+                                <button onclick="hDeleteCustomer('${c.id}')" class="w-8 h-8 rounded-full flex items-center justify-center text-slate-300 hover:text-red-500 hover:bg-red-50 transition-colors">
+                                    <span class="material-symbols-outlined !text-lg">delete</span>
+                                </button>
+                            </div>
+                            
+                            <!-- Badges -->
+                            <div class="flex gap-2">
+                                <span class="bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded text-[9px] font-black uppercase text-slate-500">
+                                    Cliente desde: ${c.since}
+                                </span>
+                                ${totalDebt > 0 ? `
+                                <div class="flex gap-2">
+                                    <span class="bg-red-50 text-red-600 px-2 py-1 rounded text-[9px] font-black uppercase flex items-center gap-1">
+                                        <span class="material-symbols-outlined !text-[10px]">warning</span>
+                                        Debe $${totalDebt.toFixed(2)}
+                                    </span>
+                                    <button onclick="hPayCustomerDebt('${c.name}')" class="bg-primary hover:bg-pink-400 text-white px-3 py-1 rounded text-[9px] font-black uppercase flex items-center gap-1 shadow-md shadow-primary/30 active:scale-95 transition-all">
+                                        <span class="material-symbols-outlined !text-[12px]">payments</span> Abonar Deuda
+                                    </button>
+                                </div>
+                                ` : `
+                                <span class="bg-emerald-50 text-emerald-600 px-2 py-1 rounded text-[9px] font-black uppercase flex items-center gap-1">
+                                    <span class="material-symbols-outlined !text-[10px]">check_circle</span>
+                                    Solvente
+                                </span>
+                                `}
+                            </div>
+                        </div>
+                    `}).join('')}
+                </div>
+            </main>
+            ${nav()}
+        </div>
+    `;
+}
+
+function hDeleteCustomer(id) {
+    const c = state.customers.find(item => item.id === id);
+    if (!c) return;
+
+    // Verificar si el cliente tiene deuda viva
+    const activeDebt = state.debts.find(d => d.customer === c.name);
+
+    if (activeDebt) {
+        alert(`❌ ACCESO DENEGADO ❌\n\nNo puedes borrar al cliente "${c.name}" porque actualmente tiene una cuenta pendiente o "Fiado" de $${activeDebt.remaining.toFixed(2)} que no ha sido liquidada. Elimina o cancela primero su deuda en la pestaña "Fiados".`);
+        return;
+    }
+
+    if (!confirm(`¿Estás seguro que deseas borrar a ${c.name} de tu base de clientes? Esto no se puede deshacer.`)) return;
+
+    state.customers = state.customers.filter(item => item.id !== id);
+    saveState();
+    renderCustomers(document.getElementById('view-customers'));
+}
+
+function hPayCustomerDebt(cName) {
+    const activeDebts = state.debts.filter(d => d.customer === cName).sort((a, b) => new Date(a.date) - new Date(b.date));
+    const totalPending = activeDebts.reduce((a, b) => a + b.remaining, 0);
+    if (totalPending <= 0) return;
+
+    const amount = parseFloat(prompt(`Monto a abonar para ${cName} (Deuda Total: $${totalPending.toFixed(2)}):`));
+    if (isNaN(amount) || amount <= 0) return;
+
+    let remainingAbono = amount;
+    for (let d of activeDebts) {
+        if (remainingAbono <= 0) break;
+        if (d.remaining <= remainingAbono) {
+            remainingAbono -= d.remaining;
+            d.remaining = 0;
+            state.debts = state.debts.filter(item => item.id !== d.id);
+        } else {
+            d.remaining -= remainingAbono;
+            remainingAbono = 0;
+        }
+    }
+
+    saveState();
+    alert(`Abono registrado exitosamente.\n\nNueva deuda total de ${cName}: $${Math.max(0, totalPending - amount).toFixed(2)}`);
+    // Re-render both views efficiently
+    if (state.currentView === 'view-customers') {
+        renderCustomers(document.getElementById('view-customers'));
+    }
 }
 
 function renderSettings(el) {
@@ -984,11 +1285,16 @@ async function hTriggerAiScan() {
         // Pausar UI (Feedback visual)
         document.querySelector("#reader").style.opacity = "0.5";
 
-        // Extraer "huella digital" visual del video en vivo
         const activation = aiModel.infer(videoObj, true);
 
         if (currentScannerMode === 'inventory') {
-            // Modo "Agregar al Inventario": Entrenamos a la IA para que recuerde esto
+            // Modo "Agregar al Inventario": Entrenamos a la IA 
+            // Para mayor precisión, tomaremos 3 muestras en vez de 1.
+            const activations = [activation];
+            for (let i = 0; i < 2; i++) {
+                await new Promise(r => setTimeout(r, 150));
+                activations.push(aiModel.infer(videoObj, true));
+            }
 
             // Extraer imagen para el preview MUY PEQUEÑA ANTES DE CERRAR LA CAMARA
             const canvas = document.createElement('canvas');
@@ -1023,13 +1329,15 @@ async function hTriggerAiScan() {
                     preview.classList.remove('hidden');
                 }
 
-                window.tempAiActivation = activation;
+                // Guardamos las activaciones para hAddProduct
+                window.tempAiActivations = activations;
 
             }, 500);
         } else if (currentScannerMode === 'sales') {
             // Modo Ventas: Buscar coincidencia
             if (knnClassifier.getNumClasses() === 0) {
                 stopScanner();
+                activation.dispose();
                 document.querySelector("#reader").style.opacity = "1";
                 alert("Aún no has registrado ningún producto con la Inteligencia Artificial.");
                 goBack();
@@ -1037,6 +1345,7 @@ async function hTriggerAiScan() {
             }
 
             const result = await knnClassifier.predictClass(activation);
+            activation.dispose(); // CRÍTICO: Evitar Memory Leak en GPU que repite artículos
 
             if (result.confidences[result.label] > 0.45) { // Si tiene más de 45% certeza
                 const product = state.inventory.find(p => p.id === result.label);
@@ -1111,11 +1420,12 @@ window.onload = async () => {
     // 2. Tasa BCV on startup
     await updateExchangeRate();
 
-    // 3. Start View
-    if (!state.isRegistered) {
-        navigateTo('view-onboarding');
+    // 3. Auth Check
+    const authCred = localStorage.getItem('cuadra_auth_cred');
+    if (!authCred) {
+        navigateTo('view-setup-auth');
     } else {
-        navigateTo(state.currentView || 'view-dashboard');
+        navigateTo('view-auth');
     }
 };
 
