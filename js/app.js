@@ -36,7 +36,12 @@ let aiScanInterval = null;
 
 // --- CORE UTILS ---
 function saveState() {
-    localStorage.setItem(APP_STORAGE, JSON.stringify(state));
+    try {
+        localStorage.setItem(APP_STORAGE, JSON.stringify(state));
+    } catch (e) {
+        console.error("Storage Error", e);
+        alert("Atención: El almacenamiento local está lleno. La imagen puede ser muy pesada o tienes demasiados productos.");
+    }
 }
 
 async function updateExchangeRate() {
@@ -354,10 +359,21 @@ function hHandleInventoryImage(input) {
     if (file) {
         const reader = new FileReader();
         reader.onload = (e) => {
-            tempInventoryImage = e.target.result;
-            const preview = document.getElementById('inv-image-preview');
-            preview.innerHTML = `<img src="${tempInventoryImage}" class="w-full h-full object-cover">`;
-            preview.classList.remove('hidden');
+            const img = new Image();
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                const maxSize = 200;
+                let w = img.width, h = img.height;
+                if (w > h) { h *= maxSize / w; w = maxSize; } else { w *= maxSize / h; h = maxSize; }
+                canvas.width = w; canvas.height = h;
+                canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                tempInventoryImage = canvas.toDataURL('image/jpeg', 0.6);
+
+                const preview = document.getElementById('inv-image-preview');
+                preview.innerHTML = `<img src="${tempInventoryImage}" class="w-full h-full object-cover">`;
+                preview.classList.remove('hidden');
+            }
+            img.src = e.target.result;
         };
         reader.readAsDataURL(file);
     }
@@ -379,7 +395,12 @@ function hAddProduct() {
     // ¿Hubo una activación de IA en progreso? (Foto recién tomada por AI Scanner)
     if (window.tempAiActivation && knnClassifier) {
         // Enseñar al KNNClassifier que esta activación es de este producto (newId)
-        knnClassifier.addExample(window.tempAiActivation, newId);
+        try {
+            knnClassifier.addExample(window.tempAiActivation, newId);
+            persistKnn(); // Guardar aprendizaje matemático
+        } catch (e) {
+            console.error(e);
+        }
         window.tempAiActivation.dispose(); // Limpiar memoria de WebGL
         window.tempAiActivation = null;
     }
@@ -578,7 +599,21 @@ async function initAI() {
             console.log("Inicializando KNN Classifier...");
             knnClassifier = knnClassifier || window.knnClassifier.create();
             console.log("KNN listo.");
-            // Si tuviéramos base de datos de KNN (embeddings), la cargaríamos aquí
+            // Restaurar dataset de LocalStorage si existe
+            const dataset = localStorage.getItem('knn_dataset');
+            if (dataset) {
+                try {
+                    const tensorObj = JSON.parse(dataset);
+                    const tensorMap = {};
+                    Object.keys(tensorObj).forEach(key => {
+                        tensorMap[key] = tf.tensor(tensorObj[key], [tensorObj[key].length / 1024, 1024]);
+                    });
+                    knnClassifier.setClassifierDataset(tensorMap);
+                    console.log("Dataset KNN restaurado.");
+                } catch (e) {
+                    console.error("Error cargando KNN dataset", e);
+                }
+            }
         }
         isAiLoading = false;
 
@@ -900,15 +935,18 @@ async function hTriggerAiScan() {
         setTimeout(() => {
             const nameInput = document.getElementById('inv-name');
             if (nameInput && !nameInput.value) {
-                nameInput.placeholder = suggestion;
+                nameInput.value = suggestedName; // Ponemos el valor real para no perderlo
             }
 
-            // Extraer imagen para el preview
+            // Extraer imagen para el preview MUY PEQUEÑA para no romper localStorage
             const canvas = document.createElement('canvas');
-            canvas.width = videoObj.videoWidth;
-            canvas.height = videoObj.videoHeight;
-            canvas.getContext('2d').drawImage(videoObj, 0, 0);
-            tempInventoryImage = canvas.toDataURL('image/jpeg');
+            const maxSize = 200;
+            const aspect = videoObj.videoWidth / videoObj.videoHeight;
+            canvas.width = maxSize;
+            canvas.height = maxSize / aspect;
+
+            canvas.getContext('2d').drawImage(videoObj, 0, 0, canvas.width, canvas.height);
+            tempInventoryImage = canvas.toDataURL('image/jpeg', 0.6);
 
             const preview = document.getElementById('inv-image-preview');
             if (preview) {
@@ -917,15 +955,30 @@ async function hTriggerAiScan() {
             }
 
             // Guardaremos temporalmente la activación (feature map) para asociarla al ID al guardar
+            // Para que no se pierda si hay delay
             window.tempAiActivation = activation;
 
-        }, 300);
+        }, 500); // 500ms para asegurar que el render de Inventory ocurrió
 
     } catch (e) {
         console.error("Error en AI Scan:", e);
         alert("Ocurrió un error al procesar la imagen con IA.");
         document.querySelector("#reader").style.opacity = "1";
     }
+}
+
+// Persistir KNN Model a LocalStorage
+function persistKnn() {
+    if (!knnClassifier) return;
+    try {
+        let dataset = knnClassifier.getClassifierDataset();
+        let datasetObj = {};
+        Object.keys(dataset).forEach((key) => {
+            let data = dataset[key].dataSync();
+            datasetObj[key] = Array.from(data);
+        });
+        localStorage.setItem('knn_dataset', JSON.stringify(datasetObj));
+    } catch (e) { console.error("Could not persist KNN", e) }
 }
 
 // Al añadir un producto en Inventario, guardamos la imagen y entrenamos KNN
