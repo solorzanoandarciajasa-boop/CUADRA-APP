@@ -176,21 +176,21 @@ function renderSetupAuth(el) {
         <div class="p-8 min-h-screen flex flex-col justify-center bg-gradient-to-br from-white to-pink-50 dark:from-slate-900 dark:to-slate-950">
             <div class="mb-12">
                 <h1 class="text-5xl font-black text-slate-900 dark:text-white tracking-tighter">CUADRA</h1>
-                <p class="text-primary font-black uppercase tracking-[0.4em] text-xs">Modo Seguridad</p>
+                <p class="text-primary font-black uppercase tracking-[0.4em] text-xs">Paso Final</p>
             </div>
             
             <div class="space-y-6">
                 <div>
-                    <h2 class="text-2xl font-black mb-2">Seguridad Biométrica</h2>
-                    <p class="text-slate-500 text-sm">Protege tu negocio usando tu huella dactilar o FaceID.</p>
+                    <h2 class="text-2xl font-black mb-2">Máxima Seguridad</h2>
+                    <p class="text-slate-500 text-sm">Bloquea tu aplicación para que solo tú puedas entrar usando tu huella dactilar o FaceID.</p>
                 </div>
                 
                 <div class="space-y-4">
-                    <button onclick="hRegisterAuth('Cliente')" class="w-full btn-primary py-4 rounded-2xl flex items-center justify-center gap-2">
-                        <span class="material-symbols-outlined">fingerprint</span> Registrar Huella Propietario
+                    <button onclick="hRegisterAuth()" class="w-full btn-primary py-4 rounded-2xl flex items-center justify-center gap-2">
+                        <span class="material-symbols-outlined">fingerprint</span> Activar Huella / FaceID
                     </button>
-                    <button onclick="hRegisterAuth('Desarrollador')" class="w-full bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 py-4 rounded-2xl font-bold uppercase tracking-widest text-xs flex items-center justify-center gap-2">
-                        <span class="material-symbols-outlined">code</span> Soy el Desarrollador (JASA)
+                    <button onclick="hFinishAuth()" class="w-full bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 py-4 rounded-2xl font-bold uppercase tracking-widest text-xs flex items-center justify-center gap-2">
+                        Omitir por ahora
                     </button>
                 </div>
             </div>
@@ -198,7 +198,7 @@ function renderSetupAuth(el) {
     `;
 }
 
-async function hRegisterAuth(role) {
+async function hRegisterAuth() {
     if (!window.PublicKeyCredential) {
         alert("Tu navegador no soporta lector de huellas web. Se omitirá este paso.");
         localStorage.setItem('cuadra_auth_cred', 'disabled');
@@ -214,9 +214,9 @@ async function hRegisterAuth(role) {
                 challenge: challenge,
                 rp: { name: "CUADRA App" },
                 user: {
-                    id: Uint8Array.from(role, c => c.charCodeAt(0)),
-                    name: role,
-                    displayName: role
+                    id: Uint8Array.from(state.business.owner, c => c.charCodeAt(0)),
+                    name: state.business.owner,
+                    displayName: state.business.owner
                 },
                 pubKeyCredParams: [{ alg: -7, type: "public-key" }, { alg: -257, type: "public-key" }],
                 authenticatorSelection: { userVerification: "required" },
@@ -225,8 +225,8 @@ async function hRegisterAuth(role) {
         });
 
         localStorage.setItem('cuadra_auth_cred', 'registered');
-        localStorage.setItem('cuadra_auth_role', role);
-        alert(role === 'Desarrollador' ? "Master/Dev access biométrico configurado." : "Huella registrada asegurando tu información.");
+        localStorage.setItem('cuadra_auth_role', state.business.owner);
+        alert("Huella registrada exitosamente. Tu información está segura.");
         hFinishAuth();
     } catch (e) {
         console.error(e);
@@ -244,7 +244,7 @@ function renderAuth(el) {
              <div class="mb-12">
                  <span class="material-symbols-outlined !text-6xl text-primary mb-4 block">lock</span>
                  <h2 class="text-2xl font-black mb-2">Bloqueo Activo</h2>
-                 <p class="text-slate-400 text-sm">Acceso biométrico requerido para<br><span class="text-primary font-bold uppercase tracking-widest mt-1 inline-block">${role}</span></p>
+                 <p class="text-slate-400 text-sm">Acceso protegido. Identidad:<br><span class="text-primary font-bold uppercase tracking-widest mt-1 inline-block">${role}</span></p>
              </div>
              
              <button onclick="hVerifyAuth()" class="w-full btn-primary py-4 rounded-2xl flex items-center justify-center gap-2 max-w-sm">
@@ -331,7 +331,13 @@ function handleRegister() {
     state.business = { owner, name, phone, address: '' };
     state.isRegistered = true;
     saveState();
-    navigateTo('view-dashboard');
+
+    // Si no ha configurado seguridad, mandarlo allá. Si ya lo hizo, mandarlo a dashboard.
+    if (!localStorage.getItem('cuadra_auth_cred')) {
+        navigateTo('view-setup-auth');
+    } else {
+        navigateTo('view-dashboard');
+    }
 }
 
 function renderDashboard(el) {
@@ -1420,12 +1426,16 @@ window.onload = async () => {
     // 2. Tasa BCV on startup
     await updateExchangeRate();
 
-    // 3. Auth Check
-    const authCred = localStorage.getItem('cuadra_auth_cred');
-    if (!authCred) {
-        navigateTo('view-setup-auth');
+    // 3. Start View & Auth Handling
+    if (!state.isRegistered) {
+        navigateTo('view-onboarding');
     } else {
-        navigateTo('view-auth');
+        const authCred = localStorage.getItem('cuadra_auth_cred');
+        if (authCred === 'registered') {
+            navigateTo('view-auth');
+        } else {
+            navigateTo(state.currentView || 'view-dashboard');
+        }
     }
 };
 
