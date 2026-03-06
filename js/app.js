@@ -150,9 +150,6 @@ function nav() {
                 <span class="material-symbols-outlined">inventory_2</span>
                 <span class="text-[8px] font-bold uppercase">Stock</span>
             </button>
-            <button onclick="navigateTo('view-scanner')" class="nav-item special">
-                <span class="material-symbols-outlined">qr_code_scanner</span>
-            </button>
             <button onclick="navigateTo('view-sales')" class="nav-item ${v === 'view-sales' ? 'active' : ''}">
                 <span class="material-symbols-outlined">shopping_cart</span>
                 <span class="text-[8px] font-bold uppercase">Venta</span>
